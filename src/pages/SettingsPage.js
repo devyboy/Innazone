@@ -1,4 +1,6 @@
 import React from 'react';
+import Menu from "../components/menu";
+
 
 class SettingsPage extends React.Component {
 	constructor(props) {
@@ -9,8 +11,9 @@ class SettingsPage extends React.Component {
 	}
 
 	render() {
-		return(
+		return (
 			<div className="App">
+				<Menu />
 				<h1>Settings Page</h1>
 			</div>
 		);

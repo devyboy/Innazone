@@ -1,6 +1,8 @@
 import React from 'react';
+import Menu from "../components/menu";
 
-class CreatePage extends React.Component {
+
+class ViewPage extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -9,12 +11,13 @@ class CreatePage extends React.Component {
 	}
 
 	render() {
-		return(
+		return (
 			<div className="App">
+				<Menu />
 				<h1>View Page</h1>
 			</div>
 		);
 	}
 }
 
-export default CreatePage;
+export default ViewPage;

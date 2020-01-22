@@ -1,4 +1,5 @@
 import React from 'react';
+import Menu from "../components/menu";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
@@ -59,6 +60,7 @@ class CreatePage extends React.Component {
 	render() {
 		return (
 			<div className="App">
+				<Menu />
 				<Form style={styles.form}>
 					<Form.Row>
 						<Form.Group as={Col} controlId="formGridEmail">
@@ -112,9 +114,9 @@ class CreatePage extends React.Component {
 				</Form>
 
 				<div
-          id={this.mapDivId}
-          style={styles.map}
-        />
+					id={this.mapDivId}
+					style={styles.map}
+				/>
 			</div>
 		);
 	}

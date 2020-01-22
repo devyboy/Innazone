@@ -1,6 +1,7 @@
 import React from 'react';
+import Menu from "../components/menu";
+import mainChallenge from "../images/mainchallenge.png";
 import '../css/App.css';
-
 
 class HomePage extends React.Component {
   constructor(props) {
@@ -12,7 +13,8 @@ class HomePage extends React.Component {
   render() {
     return (
       <div className="App">
-        <h1>Home Page</h1>
+        <Menu />
+        <img src={mainChallenge} />
       </div>
     );
   }
