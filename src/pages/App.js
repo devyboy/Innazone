@@ -1,19 +1,17 @@
 import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { firebaseConfig } from "../config.js";
 import firebase from "firebase/app";
 import "firebase/auth";
-import BrowserRouter from "react-router-dom/BrowserRouter";
-import Route from "react-router-dom/Route";
-import Switch from "react-router-dom/Switch";
 import '../css/App.css';
 
 // Lazy load the pages for better performance
 
 const HomePage = lazy(() => import("./HomePage"));
-// const CreatePage = lazy(() => import('./CreatePage'));
-// const ViewPage = lazy(() => import('./ViewEditPage'));
-// const SettingsPage = lazy(() => import('./SettingsPage'));
-// const FourOhFour = lazy(() => import('./FourOhFour'));
+const CreatePage = lazy(() => import('./CreatePage'));
+const ViewPage = lazy(() => import('./ViewPage'));
+const SettingsPage = lazy(() => import('./SettingsPage'));
+const FourOhFour = lazy(() => import('./FourOhFour'));
 
 // Firebase Credentials
 
@@ -59,11 +57,21 @@ class App extends React.Component {
             fallback={null} // fallback is an element to show while loading like a spinner or something
           >
             <Switch>
-              <Route exact path="/" render={(props) => <HomePage {...props} user={this.state.userObject} />} />
-              {/* <Route exact path="/create" render={(props) => <CreatePage {...props} user={this.state.userObject} />} />
-              <Route exact path="/view" render={(props) => <ViewPage {...props} user={this.state.userObject} />} />
-              <Route exact path="/settings" render={(props) => <SettingsPage {...props} user={this.state.userObject} update={this.update} />} />
-              <Route render={(props) => <FourOhFour {...props} user={this.state.userObject} />} /> */}
+              <Route exact path="/">
+                <HomePage />
+              </Route>
+              <Route exact path="/create">
+                <CreatePage />
+              </Route>
+              <Route exact path="/view">
+                <ViewPage />
+              </Route>
+              <Route exact path="/settings">
+                <SettingsPage />
+              </Route>
+              <Route>
+                <FourOhFour />
+              </Route>
               {/* the last route in the switch is the 404 since nothing else matched */}
             </Switch>
           </Suspense>
