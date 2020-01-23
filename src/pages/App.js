@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { firebaseConfig } from "../config.js";
 import firebase from "firebase/app";
 import "firebase/auth";
+import Menu from "../components/menu";
 import '../css/App.css';
 
 // Lazy load the pages for better performance
@@ -54,7 +55,12 @@ class App extends React.Component {
         <BrowserRouter>
           {/* // runs when lazily loading pages */}
           <Suspense
-            fallback={null} // fallback is an element to show while loading like a spinner or something
+            fallback={
+              <div className="App">
+                <Menu />
+              </div>
+            } 
+            // fallback is an element to show while loading like a spinner or something
           >
             <Switch>
               <Route exact path="/">
