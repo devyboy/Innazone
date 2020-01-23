@@ -145,7 +145,14 @@ class CreatePage extends React.Component {
 	handleFormChange(event, field) {
 		this.setState({ [field]: event.target.value },
 			() => {
-				this.map.setView(new OlView({ center: fromLonLat([this.state.lon, this.state.lat]), zoom: 15 }));
+				if (field === "lat" || field === "lon") {
+					this.map.setView(new OlView({ center: fromLonLat([this.state.lon, this.state.lat]), zoom: 15 }));
+				}
+				if (field === "faction") {
+					this.setState({ checkTotal: 0 }, () =>
+						this.calculateTotal()
+					);
+				}
 				this.calculateTotal();
 			}
 		);
@@ -172,7 +179,7 @@ class CreatePage extends React.Component {
 				<Menu />
 				<Form style={styles.form}>
 
-					<h2 style={{ textAlign: "left" }}>Create a Stalker Report</h2>
+					<h2 style={{ textAlign: "left" }}>Create a Field Report</h2>
 					<hr />
 
 					<Form.Row>
@@ -327,9 +334,55 @@ class CreatePage extends React.Component {
 						<Form.Check type="checkbox" label="Actually did this in Chernobyl (+40)" value={40} />
 						<hr />
 						<h4>Faction Specific</h4>
-						<Form.Check type="checkbox" label="Completed faction task (-15)" />
-						<Form.Check type="checkbox" label="Failure condition happened (-25)" />
-						<Form.Check type="checkbox" label="Wore your factions patch (+5)" />
+						{this.state.faction === "Loner" &&
+							<Form.Check type="checkbox" label="Brought pistol carbine or 9x18 pistol (+5)" value={5} />
+						}
+						{this.state.faction === "Bandit" &&
+							<div>
+								<Form.Check type="checkbox" label="Wore nothing but Adidas clothing (+5)" value={5} />
+								<Form.Check
+									type="checkbox"
+									label="Snuck up behind a non-stalker, shouted 'CHEEKI BREEKI IV DAMKE' and ran away (+15)" value={15}
+								/>
+							</div>
+						}
+						{this.state.faction === "Military" &&
+							<div>
+								<Form.Check type="checkbox" label="Slavshit rifle and pistol combo (+5)" value={5} />
+								<Form.Check type="checkbox" label="Only ate MREs (+5)" value={5} />
+								<Form.Check type="checkbox" label="Armor was actually slavshit (+10)" value={10} />
+							</div>
+						}
+						{this.state.faction === "Monolith" &&
+							<div>
+								<Form.Check type="checkbox" label="Audibly chanted or made noise while praying (+5)" value={5} />
+								<Form.Check type="checkbox" label="Wore a gas mask at all times while outside (+10)" value={10} />
+							</div>
+						}
+						{this.state.faction === "Scientist" &&
+							<div>
+								<Form.Check type="checkbox" label="Wore gas mask or respirator at all times while inside a structure (+10)" value={10} />
+								<Form.Check type="checkbox" label="Did your logging with a Geiger counter (+5)" value={5} />
+							</div>
+						}
+						{this.state.faction === "Mercenary" &&
+							<div>
+								<Form.Check type="checkbox" label="Brought two friends and designated one as the commander (+10)" value={10} />
+								<Form.Check type="checkbox" label="Reported to and carried our arbitrary orders from an offsite friend over radio (+10)" value={10} />
+							</div>
+						}
+						{this.state.faction === "Duty" &&
+							<div>
+								<Form.Check type="checkbox" label="Killed a mutant (any wild animal) (+5)" value={5} />
+								<Form.Check type="checkbox" label="Posted or will post a complete field report of everything you did and observed on /k/ (+10)" value={10} />
+							</div>
+						}
+						{this.state.faction === "Freedom" &&
+							<div>
+								<Form.Check type="checkbox" label="Wore all Flecktarn camo (+5)" value={5} />
+								<Form.Check type="checkbox" label="Smoked something (cigs, pot, random plant, etc) (+10)" value={10} />
+							</div>
+						}
 						<hr />
 					</Form.Group>
 
