@@ -31,7 +31,7 @@ function FourOhFour(props) {
 	return (
 		<div style={styles.fourohfour}>
 			<div style={styles.cont}>
-				<h1 style={styles.h1}>You're lost, Stalker!</h1>
+				<h1 style={styles.h1}>Lost to the Zone.</h1>
 				<p style={styles.p}>
 					Sorry, but the page you were trying to view does not exist.
 					Check your the map on your PDA or <a href="/">head back to base</a>.
