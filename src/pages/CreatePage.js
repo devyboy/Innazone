@@ -37,6 +37,7 @@ class CreatePage extends React.Component {
 			artifacts: 0,
 			documents: 0,
 			total: 0,
+			checkTotal: 0,
 			rank: "",
 			lat: 51.389,
 			lon: 30.099,
@@ -115,24 +116,29 @@ class CreatePage extends React.Component {
 
 		total += (this.state.artifacts * 1) + (this.state.documents * 2);
 
-		return (total);
+		total += this.state.checkTotal;
+
+		this.setState({ total: total }, () => {
+			this.calculateRank();
+		});
 	}
 
-	calculateRank(total) {
+	calculateRank() {
+		let total = this.state.total;
 		if (total <= 20) {
-			return ("Rookie");
+			this.setState({ rank: "Rookie" });
 		}
 		else if (total > 20 && total <= 40) {
-			return ("Experienced");
+			this.setState({ rank: "Experienced" });
 		}
 		else if (total > 40 && total <= 60) {
-			return ("Veteran");
+			this.setState({ rank: "Veteran" });
 		}
 		else if (total > 60 && total <= 80) {
-			return ("Expert");
+			this.setState({ rank: "Expert" });
 		}
 		else if (total > 80) {
-			return ("Master");
+			this.setState({ rank: "Master" });
 		}
 	}
 
@@ -141,15 +147,25 @@ class CreatePage extends React.Component {
 			() => {
 				this.map.setView(new OlView({ center: fromLonLat([this.state.lon, this.state.lat]), zoom: 15 }));
 				this.calculateTotal();
-				this.calculateRank();
 			}
 		);
 	}
 
-	render() {
-		let total = this.calculateTotal();
-		let rank = this.calculateRank(total);
+	handleCheck(event) {
+		let total = this.state.checkTotal;
+		if (event.target.checked) {
+			total += event.target.value * 1;
+		}
+		else {
+			total -= event.target.value * 1;
+		}
 
+		this.setState({ checkTotal: total }, () => {
+			this.calculateTotal();
+		});
+	}
+
+	render() {
 		return (
 			<div className="App">
 
@@ -282,33 +298,33 @@ class CreatePage extends React.Component {
 
 					<hr />
 
-					<Form.Group id="formGridCheckbox" style={{ textAlign: "left" }}>
+					<Form.Group id="formGridCheckbox" style={{ textAlign: "left" }} onChange={(e) => this.handleCheck(e)}>
 						<h4>Completion</h4>
-						<Form.Check type="checkbox" label="Didn't complete faction task (-15)" />
-						<Form.Check type="checkbox" label="Failure condition happened (-25)" />
-						<Form.Check type="checkbox" label="Wore your factions patch (+5)" />
+						<Form.Check type="checkbox" label="Didn't complete faction task (-15)" value={-15} />
+						<Form.Check type="checkbox" label="Failure condition happened (-25)" value={-25} />
+						<Form.Check type="checkbox" label="Wore your factions patch (+5)" value={5} />
 						<hr />
 						<h4>Scavenging</h4>
-						<Form.Check type="checkbox" label="Brought back usable tool (+1)" />
-						<Form.Check type="checkbox" label="Found and used a piece of gear in the field (+3)" />
+						<Form.Check type="checkbox" label="Brought back usable tool (+1)" value={1} />
+						<Form.Check type="checkbox" label="Found and used a piece of gear in the field (+3)" value={3} />
 						<hr />
 						<h4>Environmental</h4>
-						<Form.Check type="checkbox" label="Brought and played harmonica or acoustic guitar (+5)" />
-						<Form.Check type="checkbox" label="Brought and read hard copy of Roadside Picnic (+5)" />
-						<Form.Check type="checkbox" label="It rained or snowed (+5)" />
-						<Form.Check type="checkbox" label="It rained or snowed the entire time (+5)" />
-						<Form.Check type="checkbox" label="Spent each night in a different structure (+10)" />
-						<Form.Check type="checkbox" label="Lit a campfire in an old container and squatted around it (+10)" />
+						<Form.Check type="checkbox" label="Brought and played harmonica or acoustic guitar (+5)" value={5} />
+						<Form.Check type="checkbox" label="Brought and read hard copy of Roadside Picnic (+5)" value={5} />
+						<Form.Check type="checkbox" label="It rained or snowed (+5)" value={5} />
+						<Form.Check type="checkbox" label="It rained or snowed the entire time (+5)" value={5} />
+						<Form.Check type="checkbox" label="Spent each night in a different structure (+10)" value={10} />
+						<Form.Check type="checkbox" label="Lit a campfire in an old container and squatted around it (+10)" value={10} />
 						<hr />
 						<h4>Social</h4>
-						<Form.Check type="checkbox" label="Your entire party was the same faction (+5)" />
-						<Form.Check type="checkbox" label="Left a stash behind (+5)" />
-						<Form.Check type="checkbox" label="Found another Stalker's stash (+10)" />
+						<Form.Check type="checkbox" label="Your entire party was the same faction (+5)" value={5} />
+						<Form.Check type="checkbox" label="Left a stash behind (+5)" value={5} />
+						<Form.Check type="checkbox" label="Found another Stalker's stash (+10)" value={10} />
 						<hr />
 						<h4>Extreme Mode</h4>
-						<Form.Check type="checkbox" label="Was in a real-life exclusion zone (+20)" />
-						<Form.Check type="checkbox" label="Zone was actually irradiated above normal ambient levels (+20)" />
-						<Form.Check type="checkbox" label="Actually did this in Chernobyl (+40)" />
+						<Form.Check type="checkbox" label="Was in a real-life exclusion zone (+20)" value={20} />
+						<Form.Check type="checkbox" label="Zone was actually irradiated above normal ambient levels (+20)" value={20} />
+						<Form.Check type="checkbox" label="Actually did this in Chernobyl (+40)" value={40} />
 						<hr />
 						<h4>Faction Specific</h4>
 						<Form.Check type="checkbox" label="Completed faction task (-15)" />
@@ -318,8 +334,8 @@ class CreatePage extends React.Component {
 					</Form.Group>
 
 					<Form.Group style={{ textAlign: "left" }}>
-						<h3>Total Points: {total} </h3>
-						<h3>Rank: {rank} </h3>
+						<h3>Total Points: {this.state.total} </h3>
+						<h3>Rank: {this.state.rank} </h3>
 					</Form.Group>
 					<hr />
 
