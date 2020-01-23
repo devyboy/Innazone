@@ -10,11 +10,12 @@ const styles = {
 		fontFamily: "sans-serif",
 		height: '100%',
 		textAlign: 'center',
-		width: '100%'
+		width: '100%',
+		position: "absolute"
 	},
 	cont: {
 		display: 'table-cell',
-		verticalAlign: "middle",
+		verticalAlign: "middle"
 	},
 	h1: {
 		color: "#555",
