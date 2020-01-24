@@ -1,8 +1,11 @@
 import React from 'react';
+import firebase from "firebase/app";
+import "firebase/firestore";
 import Menu from "../components/menu";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
@@ -69,7 +72,7 @@ class CreatePage extends React.Component {
 			rank: "",
 			lat: 51.389,
 			lon: 30.099,
-		}
+		};
 
 		this.handleFormChange = this.handleFormChange.bind(this);
 		this.calculateTotal = this.calculateTotal.bind(this);
@@ -78,9 +81,9 @@ class CreatePage extends React.Component {
 		this.handleCheck = this.handleCheck.bind(this);
 		this.handleImageUpload = this.handleImageUpload.bind(this);
 		this.uploadImages = this.uploadImages.bind(this);
+		this.submitReport = this.submitReport.bind(this);
 
 		this.mapDivId = `map-${Math.random()}`;
-
 		this.map = new OlMap({
 			layers: [
 				new OlLayerTile({
@@ -234,19 +237,42 @@ class CreatePage extends React.Component {
 		});
 	}
 
+	submitReport() {
+		let reportsRef = firebase.firestore().collection("reports");
+
+		reportsRef.add({
+			name: this.state.name,
+			faction: this.state.faction,
+			difficulty: this.state.difficulty,
+			primary: this.state.primary,
+			secondary: this.state.secondary,
+			latitude: this.state.lat,
+			longitude: this.state.lon,
+			documents: this.state.documents,
+			artifacts: this.state.artifacts,
+			total: this.state.total,
+			rank: this.state.rank
+		}).then((res) => {
+			let key = res._key.path.segments[1];
+			this.setState({ successModal: true, shareURL: window.location.origin + `/report/${key}` });
+		}).catch((e) => {
+			console.log(e.message);
+		});
+	}
+
 	render() {
 		return (
-			<div className="App" style={{ backgroundColor: "rgb(27,27,27)" }}>
+			<div className="App">
 
 				<Menu />
 				<Form style={styles.form}>
 
-					<h2 style={{ textAlign: "left" }}>Create a Field Report</h2>
+					<h2 style={{ textAlign: "left" }}>New Field Report</h2>
 					<hr />
 
 					<Form.Row>
 
-						<Form.Group as={Col} controlId="formGridName">
+						<Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
 							<Form.Label>Name</Form.Label>
 							<Form.Control placeholder="Artyom" />
 						</Form.Group>
@@ -288,12 +314,12 @@ class CreatePage extends React.Component {
 
 					<Form.Row>
 
-						<Form.Group as={Col} controlId="formGridPrimary">
+						<Form.Group as={Col} controlId="formGridPrimary" onChange={(e) => this.handleFormChange(e, "primary")}>
 							<Form.Label>Primary Weapon</Form.Label>
 							<Form.Control placeholder="Izhmash AK-74" />
 						</Form.Group>
 
-						<Form.Group as={Col} controlId="formGridSecondary">
+						<Form.Group as={Col} controlId="formGridSecondary" onChange={(e) => this.handleFormChange(e, "secondary")}>
 							<Form.Label>Secondary Weapon</Form.Label>
 							<Form.Control placeholder="Beretta 92FS" />
 						</Form.Group>
@@ -463,13 +489,27 @@ class CreatePage extends React.Component {
 						style={styles.input}
 					/>
 
-					<label htmlFor="file" style={styles.label}>Upload Images</label>
+					<label htmlFor="file">
+						<Button variant="dark" as="div">Upload Images</Button>
+					</label>
 
 				</Form>
 
-				<Button variant="primary" onClick={this.uploadImages}>
-					Submit
+				<Button variant="warning" onClick={this.submitReport} style={{ marginBottom: "5em" }}>
+					Submit Report
 				</Button>
+
+				<Modal show={this.state.successModal} onHide={() => this.setState({ successModal: false })}>
+					<Modal.Header closeButton>
+						<Modal.Title>Field Report Created</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>Share link: <a href={this.state.shareURL} target="_blank">{this.state.shareURL}</a></Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={() => this.setState({ successModal: false })}>
+							Close
+          </Button>
+					</Modal.Footer>
+				</Modal>
 
 			</div>
 		);

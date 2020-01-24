@@ -4,7 +4,6 @@ import React from "react";
 const styles = {
 	fourohfour: {
 		lineHeight: 1.2,
-		marginTop: '2em',
 		color: '#888',
 		display: "table",
 		fontFamily: "sans-serif",

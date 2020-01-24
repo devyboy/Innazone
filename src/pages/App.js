@@ -1,10 +1,12 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { firebaseConfig } from "../config.js";
+import Spinner from "../components/spinner";
 import firebase from "firebase/app";
 import "firebase/auth";
 import Menu from "../components/menu";
 import '../css/App.css';
+import ReportPage from "../pages/ReportPage";
 
 // Lazy load the pages for better performance
 
@@ -58,6 +60,7 @@ class App extends React.Component {
             fallback={
               <div className="App">
                 <Menu />
+                <Spinner />
               </div>
             } 
             // fallback is an element to show while loading like a spinner or something
@@ -66,14 +69,17 @@ class App extends React.Component {
               <Route exact path="/">
                 <HomePage />
               </Route>
-              <Route exact path="/create">
+              <Route path="/create">
                 <CreatePage />
               </Route>
-              <Route exact path="/view">
+              <Route path="/view">
                 <ViewPage />
               </Route>
-              <Route exact path="/settings">
+              <Route path="/settings">
                 <SettingsPage />
+              </Route>
+              <Route path="/report/:rid">
+                <ReportPage />
               </Route>
               <Route>
                 <FourOhFour />
