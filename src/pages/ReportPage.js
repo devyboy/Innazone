@@ -91,6 +91,7 @@ class ReportPage extends React.Component {
 							<li>Faction: {this.state.faction}</li>
 							<li>Primary: {this.state.primary}</li>
 							<li>Secondary: {this.state.secondary}</li>
+							<li>Location: {this.state.location}</li>
 							<li>Latitude: {this.state.latitude}</li>
 							<li>Longitude: {this.state.longitude}</li>
 							<li>Documents Found: {this.state.documents}</li>

@@ -246,6 +246,7 @@ class CreatePage extends React.Component {
 			difficulty: this.state.difficulty,
 			primary: this.state.primary,
 			secondary: this.state.secondary,
+			location: this.state.location,
 			latitude: this.state.lat,
 			longitude: this.state.lon,
 			documents: this.state.documents,
@@ -322,6 +323,11 @@ class CreatePage extends React.Component {
 						<Form.Group as={Col} controlId="formGridSecondary" onChange={(e) => this.handleFormChange(e, "secondary")}>
 							<Form.Label>Secondary Weapon</Form.Label>
 							<Form.Control placeholder="Beretta 92FS" />
+						</Form.Group>
+
+						<Form.Group as={Col} controlId="formGridLocation" onChange={(e) => this.handleFormChange(e, "location")}>
+							<Form.Label>Location Name</Form.Label>
+							<Form.Control placeholder="Chernobyl Power Plant" />
 						</Form.Group>
 					</Form.Row>
 
