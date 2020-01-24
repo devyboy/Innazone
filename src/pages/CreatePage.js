@@ -10,13 +10,20 @@ import OlLayerTile from 'ol/layer/Tile';
 import OlSourceOSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 
+import paper from "../images/paper.png";
+
 
 const styles = {
 	form: {
-		width: "60%",
+		width: "50em",
 		marginLeft: "auto",
 		marginRight: "auto",
-		marginTop: "2em"
+		marginTop: "2em",
+		marginBottom: "2em",
+		padding: "2em",
+		borderRadius: '5px',
+		backgroundImage: `url(${paper})`,
+		backgroundRepeat: "repeat"
 	},
 	map: {
 		height: '400px',
@@ -25,6 +32,27 @@ const styles = {
 		marginRight: 'auto',
 		marginTop: '2em',
 		marginBottom: '2em',
+		border: '1px solid black'
+	},
+	input: {
+		width: "0.1px",
+		height: "0.1px",
+		opacity: 0,
+		overflow: "hidden",
+		position: "absolute",
+		zIndex: -1
+	},
+	label: {
+		fontSize: "1em",
+		color: "white",
+		backgroundColor: "red",
+		width: "150px",
+		padding: '.25em',
+		borderRadius: 5,
+		display: "block",
+		cursor: 'pointer',
+		marginLeft: "auto",
+		marginRight: "auto",
 	}
 }
 
@@ -46,6 +74,10 @@ class CreatePage extends React.Component {
 		this.handleFormChange = this.handleFormChange.bind(this);
 		this.calculateTotal = this.calculateTotal.bind(this);
 		this.calculateRank = this.calculateRank.bind(this);
+		this.handleFormChange = this.handleFormChange.bind(this);
+		this.handleCheck = this.handleCheck.bind(this);
+		this.handleImageUpload = this.handleImageUpload.bind(this);
+		this.uploadImages = this.uploadImages.bind(this);
 
 		this.mapDivId = `map-${Math.random()}`;
 
@@ -172,9 +204,39 @@ class CreatePage extends React.Component {
 		});
 	}
 
+	handleImageUpload(event) {
+		if (event.target.files.length > 5) {
+			alert("Please only select 5 images");
+		}
+		else {
+			this.setState({ images: event.target.files });
+		}
+	}
+
+	uploadImages() {
+		let key = "7c3859cee5b7cd6ccadc85b2b09ee89d";
+		let url = `https://api.imgbb.com/1/upload?key=${key}`;
+		let reader = new FileReader();
+		let images = Array.from(this.state.images);
+
+		reader.onloadend = function () {
+			fetch(url, {
+				method: "POST",
+				body: {
+					key: key,
+					image: reader.result
+				}
+			}).then((response) => response.json()).then((jayson) => console.log(jayson));
+		}
+
+		images.forEach(file => {
+			reader.readAsDataURL(file);
+		});
+	}
+
 	render() {
 		return (
-			<div className="App">
+			<div className="App" style={{ backgroundColor: "rgb(27,27,27)" }}>
 
 				<Menu />
 				<Form style={styles.form}>
@@ -392,11 +454,23 @@ class CreatePage extends React.Component {
 					</Form.Group>
 					<hr />
 
-					<Button variant="primary" onClick={() => console.log(this.state)}>
-						Submit
-  				</Button>
+					<input
+						type="file"
+						id="file"
+						accept=".png, .jpg, .jpeg"
+						multiple
+						onChange={(e) => this.handleImageUpload(e)}
+						style={styles.input}
+					/>
+
+					<label htmlFor="file" style={styles.label}>Upload Images</label>
 
 				</Form>
+
+				<Button variant="primary" onClick={this.uploadImages}>
+					Submit
+				</Button>
+
 			</div>
 		);
 	}
