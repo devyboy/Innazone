@@ -96,6 +96,7 @@ class CreatePage extends React.Component {
 		this.uploadImages = this.uploadImages.bind(this);
 		this.submitReport = this.submitReport.bind(this);
 		this.verifyCallback = this.verifyCallback.bind(this);
+		this.closeSuccess = this.closeSuccess.bind(this);
 
 		this.mapDivId = `map-${Math.random()}`;
 		this.map = new OlMap({
@@ -338,6 +339,17 @@ class CreatePage extends React.Component {
 				console.log(e.message);
 			});
 		}
+	}
+
+	closeSuccess() {
+		this.setState({
+			successModal: false,
+			captcha: false,
+		});
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth"
+		});
 	}
 
 	render() {
@@ -618,13 +630,13 @@ class CreatePage extends React.Component {
 					</div>
 				}
 
-				<Modal show={this.state.successModal} onHide={() => this.setState({ successModal: false })}>
+				<Modal show={this.state.successModal} onHide={this.closeSuccess}>
 					<Modal.Header closeButton>
 						<Modal.Title>{this.state.modalTitle}</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>{this.state.modalBody}</Modal.Body>
 					<Modal.Footer>
-						<Button variant="secondary" onClick={() => this.setState({ successModal: false })}>
+						<Button variant="secondary" onClick={this.closeSuccess}>
 							Close
           </Button>
 					</Modal.Footer>
