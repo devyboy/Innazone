@@ -19,7 +19,7 @@ const styles = {
 	},
 	gridContainer: {
 		display: "grid",
-		gridTemplateColumns: "auto auto auto auto",	
+		gridTemplateColumns: "auto auto auto auto",
 		margin: '3em'
 	}
 }
@@ -44,29 +44,33 @@ class ViewPage extends React.Component {
 
 	render() {
 		return (
-			<div className="App" style={{height: "100vh"}}>
+			<div className="App" style={{ height: "100vh" }}>
 				<Menu />
 				{!this.state ?
 					<Spinner />
 					:
 					<div style={styles.gridContainer}>
-						{this.state.reports.map((report) => {
-							return (
-								<Card style={styles.card}>
-									<Card.Body>
-										<Card.Title>{report[0].name}'s Report</Card.Title>
-										<Card.Text>
-											<strong>Location: </strong>{report[0].location}
-											<br />
-											<strong>Difficulty: </strong>{report[0].difficulty}
-											<br />
-											<strong>Rank: </strong>{report[0].rank}
-										</Card.Text>
-										<Button variant="dark" onClick={() => window.location.href=`/report/${report[1]}`}>View Report</Button>
-									</Card.Body>
-								</Card>
-							);
-						})}
+						{this.state.reports.length !== 0 ?
+							this.state.reports.map((report) => {
+								return (
+									<Card style={styles.card}>
+										<Card.Body>
+											<Card.Title>{report[0].name}'s Report</Card.Title>
+											<Card.Text>
+												<strong>Location: </strong>{report[0].location}
+												<br />
+												<strong>Difficulty: </strong>{report[0].difficulty}
+												<br />
+												<strong>Rank: </strong>{report[0].rank}
+											</Card.Text>
+											<Button variant="dark" onClick={() => window.location.href = `/report/${report[1]}`}>View Report</Button>
+										</Card.Body>
+									</Card>
+								);
+							})
+							:
+							<h1 style={{ color: 'white' }}>No reports to display</h1>
+						}
 					</div>
 				}
 			</div>
