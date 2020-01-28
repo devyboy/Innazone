@@ -5,7 +5,7 @@ function Spinner(props) {
 	return (
 		<div className="loading">
 			<div className="loading-in">
-				<img src={trefoil} />
+				<img src={trefoil} alt="loading-spinner" />
 			</div>
 		</div>
 	);

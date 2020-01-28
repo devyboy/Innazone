@@ -1,6 +1,9 @@
 import React from 'react';
+
 import firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/storage";
+
 import Menu from "../components/menu";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -14,6 +17,10 @@ import OlSourceOSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 
 import paper from "../images/paper.png";
+
+var Recaptcha = require('react-recaptcha');
+
+
 
 
 const styles = {
@@ -56,6 +63,12 @@ const styles = {
 		cursor: 'pointer',
 		marginLeft: "auto",
 		marginRight: "auto",
+	},
+	captcha: {
+		width: '300px',
+		marginLeft: "auto",
+		marginRight: "auto",
+		paddingBottom: "2em"
 	}
 }
 
@@ -70,8 +83,8 @@ class CreatePage extends React.Component {
 			total: 0,
 			checkTotal: 0,
 			rank: "",
-			lat: 51.389,
-			lon: 30.099,
+			primary: "",
+			secondary: "",
 		};
 
 		this.handleFormChange = this.handleFormChange.bind(this);
@@ -82,6 +95,7 @@ class CreatePage extends React.Component {
 		this.handleImageUpload = this.handleImageUpload.bind(this);
 		this.uploadImages = this.uploadImages.bind(this);
 		this.submitReport = this.submitReport.bind(this);
+		this.verifyCallback = this.verifyCallback.bind(this);
 
 		this.mapDivId = `map-${Math.random()}`;
 		this.map = new OlMap({
@@ -92,8 +106,8 @@ class CreatePage extends React.Component {
 				})
 			],
 			view: new OlView({
-				center: fromLonLat([this.state.lon, this.state.lat]),
-				zoom: 15
+				center: fromLonLat([30.099, 51.389]),
+				zoom: 14
 			})
 		});
 	}
@@ -102,6 +116,14 @@ class CreatePage extends React.Component {
 		this.map.setTarget(this.mapDivId);
 		this.calculateTotal();
 		this.calculateRank();
+	}
+
+	verifyCallback(response) {
+		this.setState({ captcha: true });
+		window.scrollTo({
+			top: document.body.scrollHeight, 
+			behavior: "smooth"
+		});
 	}
 
 	calculateTotal() {
@@ -132,6 +154,9 @@ class CreatePage extends React.Component {
 			case "Freedom":
 				total += 15;
 				break;
+			default:
+				total += 0;
+				break;
 		}
 
 		switch (this.state.difficulty) {
@@ -146,6 +171,9 @@ class CreatePage extends React.Component {
 				break;
 			case "Master":
 				total += 20;
+				break;
+			default:
+				total += 0;
 				break;
 		}
 
@@ -180,8 +208,15 @@ class CreatePage extends React.Component {
 	handleFormChange(event, field) {
 		this.setState({ [field]: event.target.value },
 			() => {
-				if (field === "lat" || field === "lon") {
-					this.map.setView(new OlView({ center: fromLonLat([this.state.lon, this.state.lat]), zoom: 15 }));
+				if (field === "lat" || field === "lon" || field === "latDir" || field === "lonDir") {
+					this.map.setView(
+						new OlView({
+							center: fromLonLat([
+								this.state.lonDir === 'W' ? this.state.lon * -1 : this.state.lon,
+								this.state.latDir === 'S' ? this.state.lat * -1 : this.state.lat
+							]),
+							zoom: 14
+						}));
 				}
 				if (field === "faction") {
 					this.setState({ checkTotal: 0 }, () =>
@@ -216,49 +251,93 @@ class CreatePage extends React.Component {
 		}
 	}
 
-	uploadImages() {
-		let key = "7c3859cee5b7cd6ccadc85b2b09ee89d";
-		let url = `https://api.imgbb.com/1/upload?key=${key}`;
-		let reader = new FileReader();
-		let images = Array.from(this.state.images);
-
-		reader.onloadend = function () {
-			fetch(url, {
-				method: "POST",
-				body: {
-					key: key,
-					image: reader.result
-				}
-			}).then((response) => response.json()).then((jayson) => console.log(jayson));
+	uploadImages(id) {
+		let shareURL = window.location.origin + `/report/${id}`;
+		if (!this.state.images) {
+			this.setState({
+				successModal: true,
+				modalTitle: "Field Report Created",
+				modalBody: <div>Share link: <a href={shareURL} target="_blank" rel="noopener noreferrer">{shareURL}</a></div>,
+			});
 		}
+		else {
+			let ref = firebase.storage().ref();
+			Array.from(this.state.images).forEach((file) => {
+				let imgRef = ref.child(`/${id}/${file.name}`);
+				imgRef.put(file).then(() => {
+					this.setState({
+						successModal: true,
+						modalTitle: "Field Report Created",
+						modalBody: <div>Share link: <a href={shareURL} target="_blank" rel="noopener noreferrer">{shareURL}</a></div>,
+					});
+				});
+			});
+		}
+	}
 
-		images.forEach(file => {
-			reader.readAsDataURL(file);
-		});
+	verifyInputs() {
+		let flag = true;
+		if (!this.state.name) {
+			flag = false;
+			this.setState({ nameError: true });
+		}
+		else {
+			this.setState({ nameError: false });
+		}
+		if (!this.state.location) {
+			flag = false;
+			this.setState({ locError: true });
+		}
+		else {
+			this.setState({ locError: false });
+		}
+		if (!this.state.lat) {
+			flag = false;
+			this.setState({ latError: true });
+		}
+		else {
+			this.setState({ latError: false });
+		}
+		if (!this.state.lon) {
+			flag = false;
+			this.setState({ lonError: true });
+		}
+		else {
+			this.setState({ lonError: false });
+		}
+		return flag;
 	}
 
 	submitReport() {
-		let reportsRef = firebase.firestore().collection("reports");
-
-		reportsRef.add({
-			name: this.state.name,
-			faction: this.state.faction,
-			difficulty: this.state.difficulty,
-			primary: this.state.primary,
-			secondary: this.state.secondary,
-			location: this.state.location,
-			latitude: this.state.lat,
-			longitude: this.state.lon,
-			documents: this.state.documents,
-			artifacts: this.state.artifacts,
-			total: this.state.total,
-			rank: this.state.rank
-		}).then((res) => {
-			let key = res._key.path.segments[1];
-			this.setState({ successModal: true, shareURL: window.location.origin + `/report/${key}` });
-		}).catch((e) => {
-			console.log(e.message);
-		});
+		if (!this.verifyInputs()) {
+			this.setState({
+				successModal: true,
+				modalTitle: "You have unfinished business",
+				modalBody: "Please fill the inputs highlighted in red and try again."
+			});
+		}
+		else {
+			let reportsRef = firebase.firestore().collection("reports");
+			reportsRef.add({
+				name: this.state.name,
+				faction: this.state.faction,
+				difficulty: this.state.difficulty,
+				primary: this.state.primary,
+				secondary: this.state.secondary,
+				location: this.state.location,
+				latitude: this.state.lat,
+				longitude: this.state.lon,
+				documents: this.state.documents,
+				artifacts: this.state.artifacts,
+				total: this.state.total,
+				rank: this.state.rank
+			}).then((res) => {
+				let key = res._key.path.segments[1];
+				this.uploadImages(key);
+			}).catch((e) => {
+				console.log(e.message);
+			});
+		}
 	}
 
 	render() {
@@ -275,7 +354,7 @@ class CreatePage extends React.Component {
 
 						<Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
 							<Form.Label>Name</Form.Label>
-							<Form.Control placeholder="Artyom" />
+							<Form.Control placeholder="Artyom" style={this.state.nameError ? { border: "2px solid red" } : null} />
 						</Form.Group>
 
 						<Form.Group as={Col} controlId="formGridFaction">
@@ -327,7 +406,7 @@ class CreatePage extends React.Component {
 
 						<Form.Group as={Col} controlId="formGridLocation" onChange={(e) => this.handleFormChange(e, "location")}>
 							<Form.Label>Location Name</Form.Label>
-							<Form.Control placeholder="Chernobyl Power Plant" />
+							<Form.Control placeholder="Chernobyl Power Plant" style={this.state.locError ? { border: "2px solid red" } : null} />
 						</Form.Group>
 					</Form.Row>
 
@@ -340,7 +419,19 @@ class CreatePage extends React.Component {
 							value={this.state.lat}
 						>
 							<Form.Label>Latitude</Form.Label>
-							<Form.Control placeholder="51.389" />
+							<Form.Control placeholder="51.389" style={this.state.latError ? { border: "2px solid red" } : null} />
+						</Form.Group>
+
+						<Form.Group as={Col} controlId="formGridLatDir">
+							<Form.Label>&nbsp;</Form.Label>
+							<Form.Control
+								as="select"
+								onChange={(e) => this.handleFormChange(e, "latDir")}
+								value={this.state.latDir}
+							>
+								<option>N</option>
+								<option>S</option>
+							</Form.Control>
 						</Form.Group>
 
 						<Form.Group
@@ -350,7 +441,19 @@ class CreatePage extends React.Component {
 							value={this.state.lon}
 						>
 							<Form.Label>Longitude</Form.Label>
-							<Form.Control placeholder="30.099" />
+							<Form.Control placeholder="30.099" style={this.state.lonError ? { border: "2px solid red" } : null} />
+						</Form.Group>
+
+						<Form.Group as={Col} controlId="formGridLonDir">
+							<Form.Label>&nbsp;</Form.Label>
+							<Form.Control
+								as="select"
+								onChange={(e) => this.handleFormChange(e, "lonDir")}
+								value={this.state.lonDir}
+							>
+								<option>E</option>
+								<option>W</option>
+							</Form.Control>
 						</Form.Group>
 
 						<Form.Group as={Col} controlId="formGridDocuments">
@@ -501,15 +604,25 @@ class CreatePage extends React.Component {
 
 				</Form>
 
-				<Button variant="warning" onClick={this.submitReport} style={{ marginBottom: "5em" }}>
-					Submit Report
-				</Button>
+				{this.state.captcha ?
+					<Button variant="warning" onClick={this.submitReport} style={{ marginBottom: "5em", marginTop: "3em" }}>
+						Submit Report
+					</Button>
+					:
+					<div style={styles.captcha}>
+						<Recaptcha
+							sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
+							render="explicit"
+							verifyCallback={this.verifyCallback}
+						/>
+					</div>
+				}
 
 				<Modal show={this.state.successModal} onHide={() => this.setState({ successModal: false })}>
 					<Modal.Header closeButton>
-						<Modal.Title>Field Report Created</Modal.Title>
+						<Modal.Title>{this.state.modalTitle}</Modal.Title>
 					</Modal.Header>
-					<Modal.Body>Share link: <a href={this.state.shareURL} target="_blank">{this.state.shareURL}</a></Modal.Body>
+					<Modal.Body>{this.state.modalBody}</Modal.Body>
 					<Modal.Footer>
 						<Button variant="secondary" onClick={() => this.setState({ successModal: false })}>
 							Close

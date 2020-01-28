@@ -1,10 +1,12 @@
 {
   "hosting": {
     "public": "build",
-    "rewrites": [{
-      "source": "**",
-      "destination": "/index.html"
-    }],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -18,6 +20,10 @@
   "functions": {
     "predeploy": [
       "npm --prefix \"$RESOURCE_DIR\" run lint"
-    ]
+    ],
+    "source": "functions"
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

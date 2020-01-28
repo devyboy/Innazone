@@ -5,7 +5,6 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import FourOhFour from "../pages/FourOhFour";
 import Menu from "../components/menu";
-import Button from "react-bootstrap/Button";
 
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';

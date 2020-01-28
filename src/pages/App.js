@@ -8,6 +8,7 @@ import Menu from "../components/menu";
 import '../css/App.css';
 import ReportPage from "../pages/ReportPage";
 
+
 // Lazy load the pages for better performance
 
 const HomePage = lazy(() => import("./HomePage"));
@@ -37,7 +38,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       // userObject: false,
-    };
+    };    
 
     // When the user logs in, set userObject to them
     // firebase.auth().onAuthStateChanged((user) => {

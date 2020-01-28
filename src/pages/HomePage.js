@@ -7,7 +7,7 @@ function HomePage(props) {
   return(
     <div className="App">
       <Menu />
-      <img src={mainChallenge} />
+      <img src={mainChallenge} alt="main-challenge" />
     </div>
   );
 }
