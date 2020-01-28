@@ -119,7 +119,7 @@ class CreatePage extends React.Component {
 		this.calculateRank();
 	}
 
-	verifyCallback(response) {
+	verifyCallback() {
 		this.setState({ captcha: true });
 		window.scrollTo({
 			top: document.body.scrollHeight, 

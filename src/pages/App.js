@@ -70,13 +70,13 @@ class App extends React.Component {
               <Route exact path="/">
                 <HomePage />
               </Route>
-              <Route path="/create">
+              <Route exact path="/create">
                 <CreatePage />
               </Route>
-              <Route path="/view">
+              <Route exact path="/view">
                 <ViewPage />
               </Route>
-              <Route path="/settings">
+              <Route exact path="/settings">
                 <SettingsPage />
               </Route>
               <Route path="/report/:rid">
