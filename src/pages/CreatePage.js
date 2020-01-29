@@ -469,7 +469,7 @@ class CreatePage extends React.Component {
 						</Form.Group>
 
 						<Form.Group as={Col} controlId="formGridDocuments">
-							<Form.Label># of Documents</Form.Label>
+							<Form.Label>Documents</Form.Label>
 							<Form.Control
 								as="select"
 								onChange={(e) => this.handleFormChange(e, "documents")}
@@ -485,7 +485,7 @@ class CreatePage extends React.Component {
 						</Form.Group>
 
 						<Form.Group as={Col} controlId="formGridArtifacts">
-							<Form.Label># of Artifacts</Form.Label>
+							<Form.Label>Artifacts</Form.Label>
 							<Form.Control
 								as="select"
 								onChange={(e) => this.handleFormChange(e, "artifacts")}
