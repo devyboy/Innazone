@@ -2,7 +2,7 @@ import React from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
-function Menu(props) {
+function Menu() {
 	return (
 		<Navbar bg="dark" variant="dark">
 			<Navbar.Brand href="/" style={{ color: "#ffc107" }}>Innazone</Navbar.Brand>
