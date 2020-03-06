@@ -69,7 +69,7 @@ class ReportPage extends React.Component {
 			else {
 				this.setState(doc.data(), () => {
 					this.map.setTarget(this.mapDivId);
-					this.map.setView(new OlView({ center: fromLonLat([this.state.longitude, this.state.latitude]), zoom: 15 }));
+					this.map.setView(new OlView({ center: fromLonLat([this.state.longitude, this.state.latitude]), zoom: 16 }));
 				});
 			}
 		});
@@ -77,7 +77,7 @@ class ReportPage extends React.Component {
 
 	render() {
 		return (
-			<div className="App">
+			<div className="App" style={{paddingBottom: "2em"}}>
 				<Menu />
 				{this.state === null ?
 					<Spinner />
