@@ -6,16 +6,25 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import Menu from "../components/menu";
 import '../css/App.css';
+
+import HomePage from "../pages/HomePage";
+import CreatePage from "../pages/CreatePage";
+import ViewPage from "../pages/ViewPage";
+import SettingsPage from "../pages/SettingsPage";
+import ChallengePage from "../pages/ChallengePage";
+import FourOhFour from "../pages/FourOhFour";
 import ReportPage from "../pages/ReportPage";
+import StashPage from "../pages/StashPage";
 
 
 // Lazy load the pages for better performance
 
-const HomePage = lazy(() => import("./HomePage"));
-const CreatePage = lazy(() => import('./CreatePage'));
-const ViewPage = lazy(() => import('./ViewPage'));
-const SettingsPage = lazy(() => import('./SettingsPage'));
-const FourOhFour = lazy(() => import('./FourOhFour'));
+// const HomePage = lazy(() => import("./HomePage"));
+// const CreatePage = lazy(() => import('./CreatePage'));
+// const ViewPage = lazy(() => import('./ViewPage'));
+// const SettingsPage = lazy(() => import('./SettingsPage'));
+// const ChallengePage = lazy(() => import('./ChallengePage'));
+// const FourOhFour = lazy(() => import('./FourOhFour'));
 
 // Firebase Credentials
 
@@ -57,14 +66,14 @@ class App extends React.Component {
       //   :
         <BrowserRouter>
           {/* // runs when lazily loading pages */}
-          <Suspense
+          {/* <Suspense
             fallback={
               <div className="App">
                 <Menu />
                 <Spinner />
               </div>
             } 
-            // fallback is an element to show while loading like a spinner or something
+            // fallback is an element to show while loading like a spinner or something */}
           >
             <Switch>
               <Route exact path="/">
@@ -79,15 +88,21 @@ class App extends React.Component {
               <Route exact path="/settings">
                 <SettingsPage />
               </Route>
+              <Route path="/challenge">
+                <ChallengePage />
+              </Route>
               <Route path="/report/:rid">
                 <ReportPage />
+              </Route>
+              <Route path="/stash/:sid">
+                <StashPage />
               </Route>
               <Route>
                 <FourOhFour />
               </Route>
               {/* the last route in the switch is the 404 since nothing else matched */}
             </Switch>
-          </Suspense>
+          {/* </Suspense> */}
         </BrowserRouter >
     );
   }
