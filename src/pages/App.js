@@ -1,10 +1,8 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { firebaseConfig } from "../config.js";
-import Spinner from "../components/spinner";
 import firebase from "firebase/app";
 import "firebase/auth";
-import Menu from "../components/menu";
 import '../css/App.css';
 
 import HomePage from "../pages/HomePage";
@@ -73,8 +71,8 @@ class App extends React.Component {
                 <Spinner />
               </div>
             } 
-            // fallback is an element to show while loading like a spinner or something */}
-          >
+            // fallback is an element to show while loading like a spinner or something
+          > */}
             <Switch>
               <Route exact path="/">
                 <HomePage />
