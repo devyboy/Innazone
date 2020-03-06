@@ -55,3 +55,32 @@
 .ol-attribution {
   display: none;
 }
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: black !important;
+  background-color: rgb(255, 193, 7) !important;
+}
+
+.nav-link {
+  color: white;
+}
+
+.nav-link:hover {
+  color: rgb(255, 193, 7);
+}
+
+.item-list {
+  text-align: left;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.item-list:hover {
+  color: #a12828;
+  cursor: pointer;
+}
+
+body > #root > div {
+  height: 100vh;
+}

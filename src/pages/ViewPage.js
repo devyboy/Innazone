@@ -18,9 +18,9 @@ const styles = {
 		marginBottom: "2em"
 	},
 	gridContainer: {
+		marginTop: "2em",
 		display: "grid",
 		gridTemplateColumns: "auto auto auto auto",
-		margin: '3em'
 	}
 }
 
@@ -44,7 +44,7 @@ class ViewPage extends React.Component {
 
 	render() {
 		return (
-			<div className="App" style={{ height: "100vh" }}>
+			<div className="App">
 				<Menu />
 				{!this.state ?
 					<Spinner />
@@ -69,7 +69,7 @@ class ViewPage extends React.Component {
 								);
 							})
 							:
-							<h1 style={{ color: 'white' }}>No reports to display</h1>
+							<h1 style={{ color: 'white' }}>PDA is empty!</h1>
 						}
 					</div>
 				}
