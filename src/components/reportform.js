@@ -4,6 +4,8 @@ import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
 
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
@@ -14,6 +16,17 @@ import { fromLonLat } from 'ol/proj';
 import firebase from "firebase/app";
 
 var Recaptcha = require('react-recaptcha');
+let recaptchaInstance;
+
+const passPopover = (
+  <Popover id="popover-basic">
+    <Popover.Title as="h3">What is this?</Popover.Title>
+    <Popover.Content>
+      This password will be used to generate a <strong>tripcode</strong>. The tripcode will be used
+      in conjunction with the provided name to uniquely identify your reports and prevent impersonation.
+    </Popover.Content>
+  </Popover>
+);
 
 class ReportForm extends React.Component {
   constructor(props) {
@@ -60,6 +73,10 @@ class ReportForm extends React.Component {
     this.map.setTarget(this.mapDivId);
     this.calculateTotal();
     this.calculateRank();
+  }
+
+  componentWillUnmount() {
+    recaptchaInstance.reset();
   }
 
   handleFormChange(event, field) {
@@ -197,13 +214,6 @@ class ReportForm extends React.Component {
 
   verifyInputs() {
     let flag = true;
-    if (!this.state.name) {
-      flag = false;
-      this.setState({ nameError: true });
-    }
-    else {
-      this.setState({ nameError: false });
-    }
     if (!this.state.location) {
       flag = false;
       this.setState({ locError: true });
@@ -238,8 +248,11 @@ class ReportForm extends React.Component {
     }
     else {
       let reportsRef = firebase.firestore().collection("reports");
+      const t = require('tripcode');
+
       reportsRef.add({
         name: this.state.name,
+        trip: t(this.state.trip),
         faction: this.state.faction,
         difficulty: this.state.difficulty,
         primary: this.state.primary,
@@ -250,7 +263,7 @@ class ReportForm extends React.Component {
         documents: this.state.documents,
         artifacts: this.state.artifacts,
         total: this.state.total,
-        rank: this.state.rank
+        rank: this.state.rank,
       }).then((res) => {
         let id = res._key.path.segments[1];
         let shareURL = window.location.origin + `/report/${id}`;
@@ -286,7 +299,14 @@ class ReportForm extends React.Component {
 
             <Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
               <Form.Label>Name</Form.Label>
-              <Form.Control placeholder="Artyom" style={this.state.nameError ? { border: "2px solid red" } : null} />
+              <Form.Control placeholder="Artyom" />
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridPass" onChange={(e) => this.handleFormChange(e, "trip")}>
+              <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
+                <Form.Label>Password (?)</Form.Label>
+              </OverlayTrigger>
+              <Form.Control placeholder="**********" />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridFaction">
@@ -537,9 +557,11 @@ class ReportForm extends React.Component {
 
         <div style={this.props.styles.captcha}>
           <Recaptcha
+            ref={e => recaptchaInstance = e}
             sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
             render="explicit"
             verifyCallback={this.verifyCallback}
+            theme="dark"
           />
         </div>
 

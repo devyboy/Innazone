@@ -21,7 +21,7 @@ const styles = {
 		marginLeft: "auto",
 		marginRight: "auto",
 		marginTop: "2em",
-		padding: "2em",
+		padding: "3em",
 		borderRadius: '5px',
 		backgroundImage: `url(${paper})`,
 		backgroundRepeat: "repeat"
@@ -77,13 +77,13 @@ class ReportPage extends React.Component {
 
 	render() {
 		return (
-			<div className="App" style={{paddingBottom: "2em"}}>
+			<div className="App" style={{height: "100%", paddingBottom: "2em"}}>
 				<Menu />
 				{this.state === null ?
 					<Spinner />
 					:
 					<div style={styles.form}>
-						<h2 style={{ textAlign: "left" }}>{this.state.name}'s Field Report</h2>
+						<h2 style={{ textAlign: "left" }}>{this.state.name + "#" + this.state.trip}</h2>
 						<hr />
 						<ul style={{textAlign: "left"}}>
 							<li>Difficulty: {this.state.difficulty}</li>

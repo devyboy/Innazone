@@ -4,6 +4,8 @@ import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import Popover from "react-bootstrap/Popover";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
@@ -14,6 +16,17 @@ import { fromLonLat } from 'ol/proj';
 import firebase from 'firebase';
 
 var Recaptcha = require('react-recaptcha');
+let recaptchaInstance;
+
+const passPopover = (
+  <Popover id="popover-basic">
+    <Popover.Title as="h3">What is this?</Popover.Title>
+    <Popover.Content>
+      This password will be used to generate a <strong>tripcode</strong>. The tripcode will be used
+      in conjunction with the provided name to uniquely identify your reports and prevent impersonation.
+    </Popover.Content>
+  </Popover>
+);
 
 class StashForm extends React.Component {
   constructor(props) {
@@ -43,13 +56,17 @@ class StashForm extends React.Component {
       ],
       view: new OlView({
         center: fromLonLat([30.099, 51.389]),
-        zoom: 16
+        zoom: 17
       })
     });
   }
 
   componentDidMount() {
     this.map.setTarget(this.mapDivId);
+  }
+
+  componentWillUnmount() {
+    recaptchaInstance.reset();
   }
 
   handleFormChange(event, field) {
@@ -62,7 +79,7 @@ class StashForm extends React.Component {
                 this.state.lonDir === 'W' ? this.state.lon * -1 : this.state.lon,
                 this.state.latDir === 'S' ? this.state.lat * -1 : this.state.lat
               ]),
-              zoom: 16
+              zoom: 17
             }));
         }
       }
@@ -141,7 +158,10 @@ class StashForm extends React.Component {
     }
     else {
       let reportsRef = firebase.firestore().collection("stashes");
+      let t = require("tripcode");
       reportsRef.add({
+        name: this.state.name,
+        trip: t(this.state.trip),
         latitude: this.state.latDir === "S" ? this.state.lat * -1 : this.state.lat,
         longitude: this.state.lonDir === "W" ? this.state.lon * -1 : this.state.lon,
         description: this.state.description,
@@ -172,8 +192,25 @@ class StashForm extends React.Component {
     return (
       <div>
         <Form style={this.props.styles.form}>
-          <h2 style={{ textAlign: "left" }}>New Stash</h2>
+          <h2 style={{ textAlign: "left" }}>New Stash Report</h2>
           <hr />
+
+          <div style={{width: '500px', margin: "0 auto"}}>
+            <Form.Row>
+              <Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
+                <Form.Label>Name</Form.Label>
+                <Form.Control placeholder="Artyom" />
+              </Form.Group>
+
+              <Form.Group as={Col} controlId="formGridPass" onChange={(e) => this.handleFormChange(e, "trip")}>
+                <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
+                  <Form.Label>Password (?)</Form.Label>
+                </OverlayTrigger>
+                <Form.Control placeholder="**********" />
+              </Form.Group>
+            </Form.Row>
+          </div>
+
           <Form.Row>
             <Form.Group
               as={Col}
@@ -288,9 +325,11 @@ class StashForm extends React.Component {
 
         <div style={this.props.styles.captcha}>
           <Recaptcha
+            ref={e => recaptchaInstance = e}
             sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
             render="explicit"
             verifyCallback={this.verifyCallback}
+            theme="dark"
           />
         </div>
 

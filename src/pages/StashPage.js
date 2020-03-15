@@ -88,7 +88,7 @@ class StashPage extends React.Component {
 					<Spinner />
 					:
 					<div style={styles.form}>
-						<h2 style={{ textAlign: "left" }}>NIGGA's Stash</h2>
+						<h2 style={{ textAlign: "left" }}>{this.state.name + "#" + this.state.trip}</h2>
 						<hr />
 						<ul style={{ textAlign: "left" }}>
 							<li>Difficulty: {this.state.description}</li>
