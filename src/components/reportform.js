@@ -13,10 +13,9 @@ import OlLayerTile from 'ol/layer/Tile';
 import OlSourceOSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 
-import firebase from "firebase/app";
+import Reaptcha from 'reaptcha';
 
-var Recaptcha = require('react-recaptcha');
-let recaptchaInstance;
+import firebase from "firebase/app";
 
 const passPopover = (
   <Popover id="popover-basic">
@@ -42,7 +41,8 @@ class ReportForm extends React.Component {
       primary: "",
       secondary: "",
       lonDir: "W",
-      latDir: "N"
+      latDir: "N",
+      captcha: false,
     };
 
     this.handleFormChange = this.handleFormChange.bind(this);
@@ -51,7 +51,6 @@ class ReportForm extends React.Component {
     this.handleCheck = this.handleCheck.bind(this);
     this.handleImageUpload = this.handleImageUpload.bind(this);
     this.submitReport = this.submitReport.bind(this);
-    this.verifyCallback = this.verifyCallback.bind(this);
     this.closeSuccess = this.closeSuccess.bind(this);
 
     this.mapDivId = `map-${Math.random()}`;
@@ -73,10 +72,6 @@ class ReportForm extends React.Component {
     this.map.setTarget(this.mapDivId);
     this.calculateTotal();
     this.calculateRank();
-  }
-
-  componentWillUnmount() {
-    recaptchaInstance.reset();
   }
 
   handleFormChange(event, field) {
@@ -153,20 +148,17 @@ class ReportForm extends React.Component {
         break;
     }
 
-    total += (this.state.artifacts * 1) + (this.state.documents * 2);
+    if (this.state.faction === "Loner") {
+      total += (this.state.artifacts * 4) + (this.state.documents * 5);
+    }
+    else {
+      total += (this.state.artifacts * 2) + (this.state.documents * 3);
+    }
 
     total += this.state.checkTotal;
 
     this.setState({ total: total }, () => {
       this.calculateRank();
-    });
-  }
-
-  verifyCallback() {
-    this.setState({ captcha: true });
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth"
     });
   }
 
@@ -299,14 +291,14 @@ class ReportForm extends React.Component {
 
             <Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
               <Form.Label>Name</Form.Label>
-              <Form.Control placeholder="Artyom" />
+              <Form.Control placeholder="Strelok" />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridPass" onChange={(e) => this.handleFormChange(e, "trip")}>
               <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
                 <Form.Label>Password (?)</Form.Label>
               </OverlayTrigger>
-              <Form.Control placeholder="**********" />
+              <Form.Control placeholder="Password" />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridFaction">
@@ -324,6 +316,7 @@ class ReportForm extends React.Component {
                 <option>Mercenary</option>
                 <option>Duty</option>
                 <option>Freedom</option>
+                <option>Clear Sky</option>
               </Form.Control>
             </Form.Group>
 
@@ -461,8 +454,8 @@ class ReportForm extends React.Component {
             <Form.Check type="checkbox" label="Wore your factions patch (+5)" value={5} />
             <hr />
             <h4>Scavenging</h4>
-            <Form.Check type="checkbox" label="Brought back usable tool (+1)" value={1} />
-            <Form.Check type="checkbox" label="Found and used a piece of gear in the field (+3)" value={3} />
+            <Form.Check type="checkbox" label="Brought back usable tool (+5)" value={5} />
+            <Form.Check type="checkbox" label="Found and used a piece of gear in the field (+5)" value={5} />
             <hr />
             <h4>Environmental</h4>
             <Form.Check type="checkbox" label="Brought and played harmonica or acoustic guitar (+5)" value={5} />
@@ -471,6 +464,7 @@ class ReportForm extends React.Component {
             <Form.Check type="checkbox" label="It rained or snowed the entire time (+5)" value={5} />
             <Form.Check type="checkbox" label="Spent each night in a different structure (+10)" value={10} />
             <Form.Check type="checkbox" label="Lit a campfire in an old container and squatted around it (+10)" value={10} />
+            <Form.Check type="checkbox" label="Stalked during winter and the average temperature was below freezing (+10)" value={10} />
             <hr />
             <h4>Social</h4>
             <Form.Check type="checkbox" label="Your entire party was the same faction (+5)" value={5} />
@@ -478,7 +472,7 @@ class ReportForm extends React.Component {
             <Form.Check type="checkbox" label="Found another Stalker's stash (+10)" value={10} />
             <hr />
             <h4>Extreme Mode</h4>
-            <Form.Check type="checkbox" label="Was in a real-life exclusion zone (+20)" value={20} />
+            <Form.Check type="checkbox" label="Explored a real-life exclusion zone (+20)" value={20} />
             <Form.Check type="checkbox" label="Zone was actually irradiated above normal ambient levels (+20)" value={20} />
             <Form.Check type="checkbox" label="Actually did this in Chernobyl (+40)" value={40} />
             <hr />
@@ -511,13 +505,14 @@ class ReportForm extends React.Component {
             {this.state.faction === "Scientist" &&
               <div>
                 <Form.Check type="checkbox" label="Wore gas mask or respirator at all times while inside a structure (+10)" value={10} />
-                <Form.Check type="checkbox" label="Did your logging with a Geiger counter (+5)" value={5} />
+                <Form.Check type="checkbox" label="Did logging with a Geiger counter (+5)" value={5} />
+                <Form.Check type="checkbox" label="Did logging with a toxic gas meter (+10)" value={5} />
               </div>
             }
             {this.state.faction === "Mercenary" &&
               <div>
                 <Form.Check type="checkbox" label="Brought two friends and designated one as the commander (+10)" value={10} />
-                <Form.Check type="checkbox" label="Reported to and carried our arbitrary orders from an offsite friend over radio (+10)" value={10} />
+                <Form.Check type="checkbox" label="Logged complete field report on paper, placed report in stash and posted photos of report to /k/ (+10)" value={10} />
               </div>
             }
             {this.state.faction === "Duty" &&
@@ -530,6 +525,13 @@ class ReportForm extends React.Component {
               <div>
                 <Form.Check type="checkbox" label="Wore all Flecktarn camo (+5)" value={5} />
                 <Form.Check type="checkbox" label="Smoked something (cigs, pot, random plant, etc) (+10)" value={10} />
+              </div>
+            }
+            {this.state.faction === "Clear Sky" &&
+              <div>
+                <Form.Check type="checkbox" label="Camped in a swamp (+5)" value={5} />
+                <Form.Check type="checkbox" label="Set up a base with fortifications and/or camo netting or similar disguise (+5)" value={5} />
+                <Form.Check type="checkbox" label="Set up a second base and camp in one of your two bases (+10)" value={10} />
               </div>
             }
             <hr />
@@ -556,12 +558,10 @@ class ReportForm extends React.Component {
         </Form>
 
         <div style={this.props.styles.captcha}>
-          <Recaptcha
-            ref={e => recaptchaInstance = e}
+          <Reaptcha 
             sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
-            render="explicit"
-            verifyCallback={this.verifyCallback}
-            theme="dark"
+            onVerify={() => this.setState({ captcha: true })}
+            theme="dark" 
           />
         </div>
 
@@ -572,7 +572,7 @@ class ReportForm extends React.Component {
           style={{ marginBottom: "5em" }}
         >
           Submit Report
-				</Button>
+          </Button>
 
         <Modal show={this.state.successModal} onHide={this.closeSuccess}>
           <Modal.Header closeButton>

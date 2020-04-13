@@ -2,7 +2,7 @@ import React from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
-function Menu() {
+function Menu(props) {
 	return (
 		<Navbar bg="dark" variant="dark">
 			<Navbar.Brand href="/" style={{ color: "#ffc107" }}>Innazone</Navbar.Brand>
@@ -13,6 +13,19 @@ function Menu() {
 				<Nav.Link href="/settings">Settings</Nav.Link>
 				<Nav.Link href="/challenge">The Challenge</Nav.Link>
 			</Nav>
+
+			{props.report &&
+				<Nav>
+					<Nav.Link onClick={props.edit}>Edit</Nav.Link>
+					<Nav.Link 
+						style={{ color: "#F33" }} 
+						onClick={props.delete}
+					>
+						Delete
+					</Nav.Link>
+				</Nav>
+			}
+
 		</Navbar>
 	);
 }

@@ -13,10 +13,9 @@ import OlLayerTile from 'ol/layer/Tile';
 import OlSourceOSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 
-import firebase from 'firebase';
+import Reaptcha from "reaptcha";
 
-var Recaptcha = require('react-recaptcha');
-let recaptchaInstance;
+import firebase from 'firebase';
 
 const passPopover = (
   <Popover id="popover-basic">
@@ -41,10 +40,10 @@ class StashForm extends React.Component {
     this.handleFormChange = this.handleFormChange.bind(this);
     this.addItem = this.addItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
-    this.verifyCallback = this.verifyCallback.bind(this);
     this.closeSuccess = this.closeSuccess.bind(this);
     this.verifyInputs = this.verifyInputs.bind(this);
     this.submitStash = this.submitStash.bind(this);
+    this.onVerify = this.onVerify.bind(this);
 
     this.mapDivId = `map-${Math.random()}`;
     this.map = new OlMap({
@@ -63,10 +62,6 @@ class StashForm extends React.Component {
 
   componentDidMount() {
     this.map.setTarget(this.mapDivId);
-  }
-
-  componentWillUnmount() {
-    recaptchaInstance.reset();
   }
 
   handleFormChange(event, field) {
@@ -95,6 +90,10 @@ class StashForm extends React.Component {
         }));
       }
     }
+  }
+
+  onVerify() {
+    this.setState({ captcha: true });
   }
 
   deleteItem(delItem) {
@@ -148,6 +147,7 @@ class StashForm extends React.Component {
     return flag;
   }
 
+
   submitStash() {
     if (!this.verifyInputs()) {
       this.setState({
@@ -180,14 +180,6 @@ class StashForm extends React.Component {
     }
   }
 
-  verifyCallback() {
-    this.setState({ captcha: true });
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth"
-    });
-  }
-
   render() {
     return (
       <div>
@@ -206,7 +198,7 @@ class StashForm extends React.Component {
                 <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
                   <Form.Label>Password (?)</Form.Label>
                 </OverlayTrigger>
-                <Form.Control placeholder="**********" />
+                <Form.Control placeholder="Password" />
               </Form.Group>
             </Form.Row>
           </div>
@@ -324,11 +316,9 @@ class StashForm extends React.Component {
         </Form>
 
         <div style={this.props.styles.captcha}>
-          <Recaptcha
-            ref={e => recaptchaInstance = e}
-            sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
-            render="explicit"
-            verifyCallback={this.verifyCallback}
+          <Reaptcha 
+            sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK" 
+            onVerify={this.onVerify} 
             theme="dark"
           />
         </div>

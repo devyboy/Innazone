@@ -18,6 +18,10 @@ const styles = {
 		gridGap: "50px",
 		display: "grid",
 		gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
+	},
+	header: {
+		margin: "2em",
+		color: "#fff"
 	}
 }
 
@@ -46,27 +50,29 @@ class ViewPage extends React.Component {
 				{!this.state ?
 					<Spinner />
 					:
-					<div style={styles.gridContainer}>
+					<div>
 						{this.state.reports.length !== 0 ?
-							this.state.reports.map((report) => {
-								return (
-									<Card style={styles.card} onClick={() => window.location.href = `/report/${report[1]}`}>
-										<Card.Body>
-											<Card.Title id="card-title">{report[0].name + "#" + report[0].trip}</Card.Title>
-											<hr />
-											<Card.Text>
-												<strong>Location: </strong>{report[0].location}
-												<br />
-												<strong>Difficulty: </strong>{report[0].difficulty}
-												<br />
-												<strong>Rank: </strong>{report[0].rank}
-											</Card.Text>
-										</Card.Body>
-									</Card>
-								);
-							})
+							<div style={styles.gridContainer}>
+								{this.state.reports.map((report) => {
+									return (
+										<Card style={styles.card} onClick={() => window.location.href = `/report/${report[1]}`}>
+											<Card.Body>
+												<Card.Title id="card-title">{report[0].name + "#" + report[0].trip}</Card.Title>
+												<hr />
+												<Card.Text>
+													<strong>Location: </strong>{report[0].location}
+													<br />
+													<strong>Difficulty: </strong>{report[0].difficulty}
+													<br />
+													<strong>Rank: </strong>{report[0].rank}
+												</Card.Text>
+											</Card.Body>
+										</Card>
+									);
+								})}
+							</div>
 							:
-							<h1 style={{ color: 'white' }}>PDA is empty!</h1>
+							<h1 style={styles.header}>PDA is empty!</h1>
 						}
 					</div>
 				}
