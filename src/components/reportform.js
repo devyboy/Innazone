@@ -15,13 +15,16 @@ import { fromLonLat } from 'ol/proj';
 
 import Reaptcha from 'reaptcha';
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 import firebase from "firebase/app";
 
 const passPopover = (
   <Popover id="popover-basic">
     <Popover.Title as="h3">What is this?</Popover.Title>
     <Popover.Content>
-      This password will be used to generate a <strong>tripcode</strong>. The tripcode will be used
+      This <strong>8-character</strong> password will be used to generate a <strong>tripcode</strong>. The tripcode will be used
       in conjunction with the provided name to uniquely identify your reports and prevent impersonation.
     </Popover.Content>
   </Popover>
@@ -43,6 +46,7 @@ class ReportForm extends React.Component {
       lonDir: "W",
       latDir: "N",
       captcha: false,
+      date: new Date(),
     };
 
     this.handleFormChange = this.handleFormChange.bind(this);
@@ -206,21 +210,35 @@ class ReportForm extends React.Component {
 
   verifyInputs() {
     let flag = true;
-    if (!this.state.location) {
+    if (!this.state.name || !this.state.name.replace(/\s/g, '').length) {
+      flag = false;
+      this.setState({ nameError: true });
+    }
+    else {
+      this.setState({ nameError: false });
+    }
+    if (!this.state.trip || !this.state.trip.replace(/\s/g, '').length) {
+      flag = false;
+      this.setState({ tripError: true });
+    }
+    else {
+      this.setState({ tripError: false });
+    }
+    if (!this.state.location || !this.state.location.replace(/\s/g, '').length) {
       flag = false;
       this.setState({ locError: true });
     }
     else {
       this.setState({ locError: false });
     }
-    if (!this.state.lat) {
+    if (!this.state.lat || !this.state.lat.replace(/\s/g, '').length) {
       flag = false;
       this.setState({ latError: true });
     }
     else {
       this.setState({ latError: false });
     }
-    if (!this.state.lon) {
+    if (!this.state.lon || !this.state.lon.replace(/\s/g, '').length) {
       flag = false;
       this.setState({ lonError: true });
     }
@@ -256,6 +274,7 @@ class ReportForm extends React.Component {
         artifacts: this.state.artifacts,
         total: this.state.total,
         rank: this.state.rank,
+        date: this.state.date.getTime()
       }).then((res) => {
         let id = res._key.path.segments[1];
         let shareURL = window.location.origin + `/report/${id}`;
@@ -291,14 +310,14 @@ class ReportForm extends React.Component {
 
             <Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
               <Form.Label>Name</Form.Label>
-              <Form.Control placeholder="Strelok" />
+              <Form.Control placeholder="Strelok" style={this.state.nameError ? { border: "2px solid red" } : null} />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridPass" onChange={(e) => this.handleFormChange(e, "trip")}>
               <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
                 <Form.Label>Password (?)</Form.Label>
               </OverlayTrigger>
-              <Form.Control placeholder="Password" />
+              <Form.Control placeholder="Password" style={this.state.tripError ? { border: "2px solid red" } : null} />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridFaction">
@@ -345,14 +364,31 @@ class ReportForm extends React.Component {
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridSecondary" onChange={(e) => this.handleFormChange(e, "secondary")}>
-              <Form.Label>Secondary Weapon</Form.Label>
+              <Form.Label>Secondary</Form.Label>
               <Form.Control placeholder="Beretta 92FS" />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridLocation" onChange={(e) => this.handleFormChange(e, "location")}>
               <Form.Label>Location Name</Form.Label>
-              <Form.Control placeholder="Chernobyl Power Plant" style={this.state.locError ? { border: "2px solid red" } : null} />
+              <Form.Control placeholder="The Zone" style={this.state.locError ? { border: "2px solid red" } : null} />
             </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridDate">
+              <Form.Label>Date</Form.Label>
+              <DatePicker
+                selected={this.state.date}
+                onChange={date => this.setState({ date: date })}
+                customInput={
+                  <Form.Control 
+                    value={this.state.date}
+                    style={this.state.dateError ? { border: "2px solid red" } : null} 
+                    readOnly
+                  />
+                }
+              />
+            </Form.Group>
+
+
           </Form.Row>
 
           <Form.Row>
@@ -558,10 +594,11 @@ class ReportForm extends React.Component {
         </Form>
 
         <div style={this.props.styles.captcha}>
-          <Reaptcha 
+          <Reaptcha
             sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
             onVerify={() => this.setState({ captcha: true })}
-            theme="dark" 
+            onExpire={() => this.setState({ captcha: false })}
+            theme="dark"
           />
         </div>
 

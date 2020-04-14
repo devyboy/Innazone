@@ -117,7 +117,9 @@ class ReportPage extends React.Component {
 					<Spinner />
 					:
 					<div style={styles.form}>
-						<h2 style={{ textAlign: "left" }}>{this.state.data.name + "#" + this.state.data.trip}</h2>
+						<h2 style={{ float: "left" }}>{this.state.data.name + "#" + this.state.data.trip}</h2>
+						<h4 style={{ float: "right" }}>{new Date(this.state.data.date).toISOString().split("T")[0]}</h4>
+						<div style={{ clear: "both" }}></div>
 						<hr />
 						<ul style={{ textAlign: "left" }}>
 							<li>Difficulty: {this.state.data.difficulty}</li>
