@@ -32,7 +32,7 @@ var config = {
   projectId: firebaseConfig.projectId,
   storageBucket: firebaseConfig.storageBucket,
   messagingSenderId: firebaseConfig.messagingSenderId,
-  appId: firebaseConfig.appId
+  appId: firebaseConfig.appId,
 };
 
 // initialize the firebase portion of the app
@@ -78,18 +78,21 @@ class App extends React.Component {
           <Route exact path="/create">
             <CreatePage />
           </Route>
-          <Route exact path="/view">
-            <ViewPage />
-          </Route>
+          <Route
+            exact
+            path="/view"
+            render={(props) => <ViewPage {...props} />}
+          />
           <Route exact path="/settings">
             <SettingsPage />
           </Route>
           <Route path="/challenge">
             <ChallengePage />
           </Route>
-          <Route path="/report/:rid">
-            <ReportPage />
-          </Route>
+          <Route
+            path="/report/:rid"
+            render={(props) => <ReportPage {...props} />}
+          />
           <Route path="/stash/:sid">
             <StashPage />
           </Route>

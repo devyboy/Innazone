@@ -35,6 +35,7 @@ const passPopover = (
 class ReportForm extends React.Component {
   constructor(props) {
     super(props);
+    this.captcha = null;
     this.state = {
       faction: "Loner",
       difficulty: "Novice",
@@ -49,7 +50,8 @@ class ReportForm extends React.Component {
       lonDir: "WEST",
       latDir: "NORTH",
       captcha: false,
-      date: new Date()
+      copy: false,
+      date: new Date(),
     };
 
     this.handleFormChange = this.handleFormChange.bind(this);
@@ -65,13 +67,13 @@ class ReportForm extends React.Component {
       layers: [
         new OlLayerTile({
           name: "OSM",
-          source: new OlSourceOSM()
-        })
+          source: new OlSourceOSM(),
+        }),
       ],
       view: new OlView({
         center: fromLonLat([30.099, 51.389]),
-        zoom: 16
-      })
+        zoom: 16,
+      }),
     });
   }
 
@@ -97,9 +99,9 @@ class ReportForm extends React.Component {
                 : this.state.lon,
               this.state.latDir === "SOUTH"
                 ? this.state.lat * -1
-                : this.state.lat
+                : this.state.lat,
             ]),
-            zoom: 16
+            zoom: 16,
           })
         );
       }
@@ -253,7 +255,7 @@ class ReportForm extends React.Component {
       this.setState({
         successModal: true,
         modalTitle: "You have unfinished business",
-        modalBody: "Please fill the inputs highlighted in red and try again."
+        modalBody: "Please fill the inputs highlighted in red and try again.",
       });
     } else {
       let reportsRef = firebase.firestore().collection("reports");
@@ -279,44 +281,52 @@ class ReportForm extends React.Component {
           artifacts: this.state.artifacts,
           total: this.state.total,
           rank: this.state.rank,
-          date: this.state.date.getTime()
+          date: this.state.date.getTime(),
         })
-        .then(res => {
+        .then((res) => {
           let id = res._key.path.segments[1];
           let shareURL = window.location.origin + `/report/${id}`;
+          this.setState({ shareURL: shareURL });
           this.setState({
             successModal: true,
             modalTitle: "Field Report Created",
+            copy: true,
             modalBody: (
               <div>
                 Share link:{" "}
-                <a href={shareURL} rel="noopener noreferrer">
-                  {shareURL}
+                <a href={this.state.shareURL} rel="noopener noreferrer">
+                  {this.state.shareURL}
                 </a>
               </div>
-            )
+            ),
           });
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e.message);
         });
     }
   }
 
   closeSuccess() {
+    document.getElementById("reportForm").reset();
     this.setState({
-      successModal: false
+      successModal: false,
     });
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
+    this.captcha.reset();
   }
 
   render() {
     return (
       <div>
-        <Form style={this.props.styles.form} className="special">
+        <Form
+          style={this.props.styles.form}
+          className="special"
+          id="reportForm"
+        >
           <h2 style={{ textAlign: "left" }}>New Field Report</h2>
           <hr />
 
@@ -324,7 +334,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridName"
-              onChange={e => this.handleFormChange(e, "name")}
+              onChange={(e) => this.handleFormChange(e, "name")}
             >
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -338,7 +348,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridPass"
-              onChange={e => this.handleFormChange(e, "trip")}
+              onChange={(e) => this.handleFormChange(e, "trip")}
             >
               <OverlayTrigger
                 trigger="hover"
@@ -360,7 +370,7 @@ class ReportForm extends React.Component {
               <Form.Label>Faction</Form.Label>
               <Form.Control
                 as="select"
-                onChange={e => this.handleFormChange(e, "faction")}
+                onChange={(e) => this.handleFormChange(e, "faction")}
                 value={this.state.faction}
               >
                 <option>Loner</option>
@@ -378,7 +388,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridDifficulty"
-              onChange={e => this.handleFormChange(e, "difficulty")}
+              onChange={(e) => this.handleFormChange(e, "difficulty")}
               value={this.state.difficulty}
             >
               <Form.Label>Difficulty</Form.Label>
@@ -395,7 +405,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridPrimary"
-              onChange={e => this.handleFormChange(e, "primary")}
+              onChange={(e) => this.handleFormChange(e, "primary")}
             >
               <Form.Label>Primary Weapon</Form.Label>
               <Form.Control placeholder="Izhmash AK-74" />
@@ -404,7 +414,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridSecondary"
-              onChange={e => this.handleFormChange(e, "secondary")}
+              onChange={(e) => this.handleFormChange(e, "secondary")}
             >
               <Form.Label>Secondary</Form.Label>
               <Form.Control placeholder="Beretta 92FS" />
@@ -413,7 +423,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridLocation"
-              onChange={e => this.handleFormChange(e, "location")}
+              onChange={(e) => this.handleFormChange(e, "location")}
             >
               <Form.Label>Location Name</Form.Label>
               <Form.Control
@@ -426,7 +436,7 @@ class ReportForm extends React.Component {
               <Form.Label>Date</Form.Label>
               <DatePicker
                 selected={this.state.date}
-                onChange={date => this.setState({ date: date })}
+                onChange={(date) => this.setState({ date: date })}
                 customInput={
                   <Form.Control
                     value={this.state.date}
@@ -444,7 +454,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridLat"
-              onChange={e => this.handleFormChange(e, "lat")}
+              onChange={(e) => this.handleFormChange(e, "lat")}
               value={this.state.lat}
             >
               <Form.Label>Latitude</Form.Label>
@@ -458,7 +468,7 @@ class ReportForm extends React.Component {
               <Form.Label>&nbsp;</Form.Label>
               <Form.Control
                 as="select"
-                onChange={e => this.handleFormChange(e, "latDir")}
+                onChange={(e) => this.handleFormChange(e, "latDir")}
                 value={this.state.latDir}
               >
                 <option>NORTH</option>
@@ -469,7 +479,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridLon"
-              onChange={e => this.handleFormChange(e, "lon")}
+              onChange={(e) => this.handleFormChange(e, "lon")}
               value={this.state.lon}
             >
               <Form.Label>Longitude</Form.Label>
@@ -483,7 +493,7 @@ class ReportForm extends React.Component {
               <Form.Label>&nbsp;</Form.Label>
               <Form.Control
                 as="select"
-                onChange={e => this.handleFormChange(e, "lonDir")}
+                onChange={(e) => this.handleFormChange(e, "lonDir")}
                 value={this.state.lonDir}
               >
                 <option>WEST</option>
@@ -495,7 +505,7 @@ class ReportForm extends React.Component {
               <Form.Label>Documents</Form.Label>
               <Form.Control
                 as="select"
-                onChange={e => this.handleFormChange(e, "documents")}
+                onChange={(e) => this.handleFormChange(e, "documents")}
                 value={this.state.documents}
               >
                 <option>0</option>
@@ -511,7 +521,7 @@ class ReportForm extends React.Component {
               <Form.Label>Artifacts</Form.Label>
               <Form.Control
                 as="select"
-                onChange={e => this.handleFormChange(e, "artifacts")}
+                onChange={(e) => this.handleFormChange(e, "artifacts")}
                 value={this.state.artifacts}
               >
                 <option>0</option>
@@ -532,7 +542,7 @@ class ReportForm extends React.Component {
           <Form.Row>
             <Form.Label>Description</Form.Label>
             <Form.Control
-              onChange={e => this.handleFormChange(e, "description")}
+              onChange={(e) => this.handleFormChange(e, "description")}
               as="textarea"
               rows={10}
               maxLength={2000}
@@ -547,7 +557,7 @@ class ReportForm extends React.Component {
           <Form.Group
             id="formGridCheckbox"
             style={{ textAlign: "left" }}
-            onChange={e => this.handleCheck(e)}
+            onChange={(e) => this.handleCheck(e)}
           >
             <h4>Completion</h4>
             <Form.Check
@@ -798,7 +808,7 @@ class ReportForm extends React.Component {
             id="file"
             accept=".png, .jpg, .jpeg"
             multiple
-            onChange={e => this.handleImageUpload(e)}
+            onChange={(e) => this.handleImageUpload(e)}
             style={this.props.styles.input}
           />
 
@@ -811,6 +821,7 @@ class ReportForm extends React.Component {
 
         <div style={this.props.styles.captcha}>
           <Reaptcha
+            ref={(e) => (this.captcha = e)}
             sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
             onVerify={() => this.setState({ captcha: true })}
             onExpire={() => this.setState({ captcha: false })}
@@ -832,10 +843,20 @@ class ReportForm extends React.Component {
             <Modal.Title>{this.state.modalTitle}</Modal.Title>
           </Modal.Header>
           <Modal.Body>{this.state.modalBody}</Modal.Body>
-          <Modal.Footer>
+          <Modal.Footer style={{ borderTopWidth: 0 }}>
             <Button variant="secondary" onClick={this.closeSuccess}>
               Close
             </Button>
+            {this.state.copy && (
+              <Button
+                variant="primary"
+                onClick={() =>
+                  navigator.clipboard.writeText(this.state.shareURL)
+                }
+              >
+                Copy Link
+              </Button>
+            )}
           </Modal.Footer>
         </Modal>
       </div>

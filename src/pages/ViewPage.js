@@ -4,6 +4,7 @@ import Spinner from "../components/spinner";
 import firebase from "firebase/app";
 import "firebase/firestore";
 import Card from "react-bootstrap/Card";
+import Toast from "react-bootstrap/Toast";
 import paper from "../images/paper.png";
 
 const styles = {
@@ -11,18 +12,18 @@ const styles = {
     backgroundImage: `url(${paper})`,
     backgroundRepeat: "repeat",
     textAlign: "left",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   gridContainer: {
     padding: "50px",
     gridGap: "50px",
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))"
+    gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
   },
   header: {
     margin: "2em",
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 };
 
 class ViewPage extends React.Component {
@@ -36,17 +37,21 @@ class ViewPage extends React.Component {
     let reportRef = firebase.firestore().collection("reports");
     reportRef
       .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
           reports.push([doc.data(), doc.id]);
         });
       })
       .then(() => {
-        this.setState({ reports: reports });
+        this.setState({
+          reports: reports,
+          deleted: this.props.location.state ? true : false,
+        });
       });
   }
 
   render() {
+    console.log(this.props);
     return (
       <div className="App">
         <Menu />
@@ -56,7 +61,7 @@ class ViewPage extends React.Component {
           <div>
             {this.state.reports.length !== 0 ? (
               <div style={styles.gridContainer}>
-                {this.state.reports.map(report => {
+                {this.state.reports.map((report) => {
                   return (
                     <Card
                       style={styles.card}
@@ -92,6 +97,30 @@ class ViewPage extends React.Component {
             )}
           </div>
         )}
+        <Toast
+          show={this.state ? this.state.deleted : false}
+          onClose={() => this.setState({ deleted: false })}
+          delay={5500}
+          autohide
+          style={{
+            position: "absolute",
+            textAlign: "left",
+            width: 300,
+            bottom: 50,
+            right: 40,
+          }}
+        >
+          <Toast.Header>
+            <img
+              src="holder.js/20x20?text=%20"
+              className="rounded mr-2"
+              alt=""
+            />
+            <strong className="mr-auto">Innazone</strong>
+            <small>just now</small>
+          </Toast.Header>
+          <Toast.Body>Field report successfully deleted</Toast.Body>
+        </Toast>
       </div>
     );
   }
