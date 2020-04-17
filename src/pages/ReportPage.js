@@ -1,42 +1,42 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Spinner from "../components/spinner";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import FourOhFour from "../pages/FourOhFour";
-import Menu from "../components/menu";
-import { Modal, Button, Form } from "react-bootstrap";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Spinner from '../components/spinner';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import FourOhFour from '../pages/FourOhFour';
+import Menu from '../components/menu';
+import { Modal, Button, Form } from 'react-bootstrap';
 
-import OlMap from "ol/Map";
-import OlView from "ol/View";
-import OlLayerTile from "ol/layer/Tile";
-import OlSourceOSM from "ol/source/OSM";
-import { fromLonLat } from "ol/proj";
+import OlMap from 'ol/Map';
+import OlView from 'ol/View';
+import OlLayerTile from 'ol/layer/Tile';
+import OlSourceOSM from 'ol/source/OSM';
+import { fromLonLat } from 'ol/proj';
 
-import Reaptcha from "reaptcha";
+import Reaptcha from 'reaptcha';
 
-import paper from "../images/paper.png";
+import paper from '../images/paper.png';
 
 const styles = {
   form: {
-    width: "50em",
-    marginLeft: "auto",
-    marginRight: "auto",
-    marginTop: "3em",
-    padding: "3em",
-    borderRadius: "5px",
+    width: '50em',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: '3em',
+    padding: '3em',
+    borderRadius: '5px',
     backgroundImage: `url(${paper})`,
-    backgroundRepeat: "repeat",
+    backgroundRepeat: 'repeat'
   },
   map: {
-    height: "400px",
-    width: "650px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    marginTop: "2em",
-    marginBottom: "2em",
-    border: "1px solid black",
-  },
+    height: '400px',
+    width: '650px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: '2em',
+    marginBottom: '2em',
+    border: '1px solid black'
+  }
 };
 
 class ReportPage extends React.Component {
@@ -46,7 +46,7 @@ class ReportPage extends React.Component {
     this.state = {
       data: null,
       deleteModal: false,
-      error: false,
+      error: false
     };
 
     this.fetchReport = this.fetchReport.bind(this);
@@ -59,10 +59,10 @@ class ReportPage extends React.Component {
     this.map = new OlMap({
       layers: [
         new OlLayerTile({
-          name: "OSM",
-          source: new OlSourceOSM(),
-        }),
-      ],
+          name: 'OSM',
+          source: new OlSourceOSM()
+        })
+      ]
     });
   }
 
@@ -72,12 +72,12 @@ class ReportPage extends React.Component {
 
   fetchReport() {
     let rid = window.location.pathname.substring(
-      window.location.pathname.lastIndexOf("/") + 1
+      window.location.pathname.lastIndexOf('/') + 1
     );
-    let reportRef = firebase.firestore().collection("reports").doc(rid);
+    let reportRef = firebase.firestore().collection('reports').doc(rid);
     reportRef.get().then((doc) => {
       if (!doc.exists) {
-        ReactDOM.render(<FourOhFour />, document.getElementById("root"));
+        ReactDOM.render(<FourOhFour />, document.getElementById('root'));
       } else {
         this.setState({ data: doc.data() }, () => {
           this.map.setTarget(this.mapDivId);
@@ -85,9 +85,9 @@ class ReportPage extends React.Component {
             new OlView({
               center: fromLonLat([
                 this.state.data.longitude,
-                this.state.data.latitude,
+                this.state.data.latitude
               ]),
-              zoom: 16,
+              zoom: 16
             })
           );
         });
@@ -104,18 +104,18 @@ class ReportPage extends React.Component {
   }
 
   deleteReport() {
-    const t = require("tripcode");
+    const t = require('tripcode');
     if (t(this.state.password) === this.state.data.trip) {
       let rid = window.location.pathname.substring(
-        window.location.pathname.lastIndexOf("/") + 1
+        window.location.pathname.lastIndexOf('/') + 1
       );
-      let reportRef = firebase.firestore().collection("reports").doc(rid);
+      let reportRef = firebase.firestore().collection('reports').doc(rid);
       reportRef.delete().then(() => {
         this.props.history.push({
-          pathname: "/view",
+          pathname: '/view',
           state: {
-            deleted: true,
-          },
+            deleted: true
+          }
         });
       });
     } else {
@@ -131,22 +131,22 @@ class ReportPage extends React.Component {
   render() {
     console.log(this.props);
     return (
-      <div className="App" style={{ height: "100%", paddingBottom: "2em" }}>
+      <div className='App' style={{ height: '100%', paddingBottom: '2em' }}>
         <Menu report delete={this.showDelete} />
         {this.state.data === null ? (
           <Spinner />
         ) : (
-          <div style={styles.form} className="special">
-            <h2 style={{ float: "left" }}>
+          <div style={styles.form} className='special'>
+            <h2 style={{ float: 'left' }}>
               <strong>{this.state.data.name}</strong>
-              {" #" + this.state.data.trip}
+              {' #' + this.state.data.trip}
             </h2>
-            <h4 style={{ float: "right" }}>
-              {new Date(this.state.data.date).toISOString().split("T")[0]}
+            <h4 style={{ float: 'right' }}>
+              {new Date(this.state.data.date).toISOString().split('T')[0]}
             </h4>
-            <div style={{ clear: "both" }}></div>
+            <div style={{ clear: 'both' }}></div>
             <hr />
-            <ul style={{ textAlign: "left" }}>
+            <ul style={{ textAlign: 'left' }}>
               <li>Difficulty: {this.state.data.difficulty}</li>
               <li>Faction: {this.state.data.faction}</li>
               <li>Primary: {this.state.data.primary}</li>
@@ -173,36 +173,36 @@ class ReportPage extends React.Component {
             permanent. To proceed, enter the pasword you used to create it below
             and click "Delete".
             <Form
-              style={{ marginTop: "1em" }}
+              style={{ marginTop: '1em' }}
               onSubmit={(e) => e.preventDefault()}
             >
               <Form.Control
-                type="password"
-                placeholder="password"
+                type='password'
+                placeholder='password'
                 onChange={this.updatePassword}
               />
             </Form>
             <span
               style={{
-                color: "red",
-                visibility: this.state.error ? "visible" : "hidden",
+                color: 'red',
+                visibility: this.state.error ? 'visible' : 'hidden'
               }}
             >
               Incorrect password, please try again
             </span>
           </Modal.Body>
           <Modal.Footer style={{ borderTopWidth: 0 }}>
-            <Button variant="secondary" onClick={this.closeModal}>
+            <Button variant='secondary' onClick={this.closeModal}>
               Close
             </Button>
             <Reaptcha
               ref={(e) => (this.captcha = e)}
-              sitekey="6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK"
+              sitekey='6LfQn9MUAAAAAD2R5eeaT0byQmBQcAmmd-HfdyvK'
               onVerify={this.deleteReport}
-              size="invisible"
-              theme="dark"
+              size='invisible'
+              theme='dark'
             />
-            <Button variant="danger" onClick={() => this.captcha.execute()}>
+            <Button variant='danger' onClick={() => this.captcha.execute()}>
               Delete
             </Button>
           </Modal.Footer>
