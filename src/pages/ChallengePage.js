@@ -1,16 +1,16 @@
-import React from 'react';
+import React from "react";
 import Menu from "../components/menu";
-import '../css/App.css';
+import "../css/App.css";
 
 import challenge from "../images/mainchallenge.png";
 
 function ChallengePage(props) {
-  return(
-    <div className="App" style={{color: 'white'}}>
+  return (
+    <div className="App" style={{ color: "white" }}>
       <Menu />
-      <div style={{marginTop: "2em"}}>
+      <div style={{ marginTop: "2em" }}>
         <h1>The Challenge</h1>
-        <img src={challenge} alt="challenge"/>
+        <img src={challenge} alt="challenge" />
       </div>
     </div>
   );

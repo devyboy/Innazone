@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -7,13 +7,13 @@ import Modal from "react-bootstrap/Modal";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 
-import OlMap from 'ol/Map';
-import OlView from 'ol/View';
-import OlLayerTile from 'ol/layer/Tile';
-import OlSourceOSM from 'ol/source/OSM';
-import { fromLonLat } from 'ol/proj';
+import OlMap from "ol/Map";
+import OlView from "ol/View";
+import OlLayerTile from "ol/layer/Tile";
+import OlSourceOSM from "ol/source/OSM";
+import { fromLonLat } from "ol/proj";
 
-import Reaptcha from 'reaptcha';
+import Reaptcha from "reaptcha";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -24,8 +24,10 @@ const passPopover = (
   <Popover id="popover-basic">
     <Popover.Title as="h3">What is this?</Popover.Title>
     <Popover.Content>
-      This <strong>8-character</strong> password will be used to generate a <strong>tripcode</strong>. The tripcode will be used
-      in conjunction with the provided name to uniquely identify your reports and prevent impersonation.
+      This <strong>8-character</strong> password will be used to generate a{" "}
+      <strong>tripcode</strong>. The tripcode will be used in conjunction with
+      the provided name to uniquely identify your reports and prevent
+      impersonation.
     </Popover.Content>
   </Popover>
 );
@@ -43,10 +45,11 @@ class ReportForm extends React.Component {
       rank: "",
       primary: "",
       secondary: "",
-      lonDir: "W",
-      latDir: "N",
+      description: "",
+      lonDir: "WEST",
+      latDir: "NORTH",
       captcha: false,
-      date: new Date(),
+      date: new Date()
     };
 
     this.handleFormChange = this.handleFormChange.bind(this);
@@ -61,7 +64,7 @@ class ReportForm extends React.Component {
     this.map = new OlMap({
       layers: [
         new OlLayerTile({
-          name: 'OSM',
+          name: "OSM",
           source: new OlSourceOSM()
         })
       ],
@@ -79,26 +82,32 @@ class ReportForm extends React.Component {
   }
 
   handleFormChange(event, field) {
-    this.setState({ [field]: event.target.value },
-      () => {
-        if (field === "lat" || field === "lon" || field === "latDir" || field === "lonDir") {
-          this.map.setView(
-            new OlView({
-              center: fromLonLat([
-                this.state.lonDir === 'W' ? this.state.lon * -1 : this.state.lon,
-                this.state.latDir === 'S' ? this.state.lat * -1 : this.state.lat
-              ]),
-              zoom: 16
-            }));
-        }
-        if (field === "faction") {
-          this.setState({ checkTotal: 0 }, () =>
-            this.calculateTotal()
-          );
-        }
-        this.calculateTotal();
+    this.setState({ [field]: event.target.value }, () => {
+      if (
+        field === "lat" ||
+        field === "lon" ||
+        field === "latDir" ||
+        field === "lonDir"
+      ) {
+        this.map.setView(
+          new OlView({
+            center: fromLonLat([
+              this.state.lonDir === "WEST"
+                ? this.state.lon * -1
+                : this.state.lon,
+              this.state.latDir === "SOUTH"
+                ? this.state.lat * -1
+                : this.state.lat
+            ]),
+            zoom: 16
+          })
+        );
       }
-    );
+      if (field === "faction") {
+        this.setState({ checkTotal: 0 }, () => this.calculateTotal());
+      }
+      this.calculateTotal();
+    });
   }
 
   calculateTotal() {
@@ -153,10 +162,9 @@ class ReportForm extends React.Component {
     }
 
     if (this.state.faction === "Loner") {
-      total += (this.state.artifacts * 4) + (this.state.documents * 5);
-    }
-    else {
-      total += (this.state.artifacts * 2) + (this.state.documents * 3);
+      total += this.state.artifacts * 4 + this.state.documents * 5;
+    } else {
+      total += this.state.artifacts * 2 + this.state.documents * 3;
     }
 
     total += this.state.checkTotal;
@@ -170,17 +178,13 @@ class ReportForm extends React.Component {
     let total = this.state.total;
     if (total <= 20) {
       this.setState({ rank: "Rookie" });
-    }
-    else if (total > 20 && total <= 40) {
+    } else if (total > 20 && total <= 40) {
       this.setState({ rank: "Experienced" });
-    }
-    else if (total > 40 && total <= 60) {
+    } else if (total > 40 && total <= 60) {
       this.setState({ rank: "Veteran" });
-    }
-    else if (total > 60 && total <= 80) {
+    } else if (total > 60 && total <= 80) {
       this.setState({ rank: "Expert" });
-    }
-    else if (total > 80) {
+    } else if (total > 80) {
       this.setState({ rank: "Master" });
     }
   }
@@ -189,8 +193,7 @@ class ReportForm extends React.Component {
     let total = this.state.checkTotal;
     if (event.target.checked) {
       total += event.target.value * 1;
-    }
-    else {
+    } else {
       total -= event.target.value * 1;
     }
 
@@ -202,47 +205,44 @@ class ReportForm extends React.Component {
   handleImageUpload(event) {
     if (event.target.files.length > 5) {
       alert("Please only select 5 images");
-    }
-    else {
+    } else {
       this.setState({ images: event.target.files });
     }
   }
 
   verifyInputs() {
     let flag = true;
-    if (!this.state.name || !this.state.name.replace(/\s/g, '').length) {
+    if (!this.state.name || !this.state.name.replace(/\s/g, "").length) {
       flag = false;
       this.setState({ nameError: true });
-    }
-    else {
+    } else {
       this.setState({ nameError: false });
     }
-    if (!this.state.trip || !this.state.trip.replace(/\s/g, '').length) {
+    if (!this.state.trip || !this.state.trip.replace(/\s/g, "").length) {
       flag = false;
       this.setState({ tripError: true });
-    }
-    else {
+    } else {
       this.setState({ tripError: false });
     }
-    if (!this.state.location || !this.state.location.replace(/\s/g, '').length) {
+    if (
+      !this.state.location ||
+      !this.state.location.replace(/\s/g, "").length
+    ) {
       flag = false;
       this.setState({ locError: true });
-    }
-    else {
+    } else {
       this.setState({ locError: false });
     }
-    if (!this.state.lat || !this.state.lat.replace(/\s/g, '').length) {
+    if (!this.state.lat || !this.state.lat.replace(/\s/g, "").length) {
       flag = false;
       this.setState({ latError: true });
-    }
-    else {
+    } else {
       this.setState({ latError: false });
     }
-    if (!this.state.lon || !this.state.lon.replace(/\s/g, '').length) {
+    if (!this.state.lon || !this.state.lon.replace(/\s/g, "").length) {
       flag = false;
       this.setState({ lonError: true });
-    }
-    else {
+    } else {
       this.setState({ lonError: false });
     }
     return flag;
@@ -255,43 +255,57 @@ class ReportForm extends React.Component {
         modalTitle: "You have unfinished business",
         modalBody: "Please fill the inputs highlighted in red and try again."
       });
-    }
-    else {
+    } else {
       let reportsRef = firebase.firestore().collection("reports");
-      const t = require('tripcode');
+      const t = require("tripcode");
 
-      reportsRef.add({
-        name: this.state.name,
-        trip: t(this.state.trip),
-        faction: this.state.faction,
-        difficulty: this.state.difficulty,
-        primary: this.state.primary,
-        secondary: this.state.secondary,
-        location: this.state.location,
-        longitude: this.state.lonDir === 'W' ? this.state.lon * -1 : this.state.lon, // convert coords
-        latitude: this.state.latDir === 'S' ? this.state.lat * -1 : this.state.lat,
-        documents: this.state.documents,
-        artifacts: this.state.artifacts,
-        total: this.state.total,
-        rank: this.state.rank,
-        date: this.state.date.getTime()
-      }).then((res) => {
-        let id = res._key.path.segments[1];
-        let shareURL = window.location.origin + `/report/${id}`;
-        this.setState({
-          successModal: true,
-          modalTitle: "Field Report Created",
-          modalBody: <div>Share link: <a href={shareURL} rel="noopener noreferrer">{shareURL}</a></div>,
+      reportsRef
+        .add({
+          name: this.state.name,
+          trip: t(this.state.trip),
+          faction: this.state.faction,
+          difficulty: this.state.difficulty,
+          primary: this.state.primary,
+          secondary: this.state.secondary,
+          location: this.state.location,
+          description: this.state.description,
+          longitude:
+            this.state.lonDir === "WEST" ? this.state.lon * -1 : this.state.lon,
+          latitude:
+            this.state.latDir === "SOUTH"
+              ? this.state.lat * -1
+              : this.state.lat,
+          documents: this.state.documents,
+          artifacts: this.state.artifacts,
+          total: this.state.total,
+          rank: this.state.rank,
+          date: this.state.date.getTime()
+        })
+        .then(res => {
+          let id = res._key.path.segments[1];
+          let shareURL = window.location.origin + `/report/${id}`;
+          this.setState({
+            successModal: true,
+            modalTitle: "Field Report Created",
+            modalBody: (
+              <div>
+                Share link:{" "}
+                <a href={shareURL} rel="noopener noreferrer">
+                  {shareURL}
+                </a>
+              </div>
+            )
+          });
+        })
+        .catch(e => {
+          console.log(e.message);
         });
-      }).catch((e) => {
-        console.log(e.message);
-      });
     }
   }
 
   closeSuccess() {
     this.setState({
-      successModal: false,
+      successModal: false
     });
     window.scrollTo({
       top: 0,
@@ -302,29 +316,51 @@ class ReportForm extends React.Component {
   render() {
     return (
       <div>
-        <Form style={this.props.styles.form}>
+        <Form style={this.props.styles.form} className="special">
           <h2 style={{ textAlign: "left" }}>New Field Report</h2>
           <hr />
 
           <Form.Row>
-
-            <Form.Group as={Col} controlId="formGridName" onChange={(e) => this.handleFormChange(e, "name")}>
+            <Form.Group
+              as={Col}
+              controlId="formGridName"
+              onChange={e => this.handleFormChange(e, "name")}
+            >
               <Form.Label>Name</Form.Label>
-              <Form.Control placeholder="Strelok" style={this.state.nameError ? { border: "2px solid red" } : null} />
+              <Form.Control
+                placeholder="Strelok"
+                style={
+                  this.state.nameError ? { border: "2px solid red" } : null
+                }
+              />
             </Form.Group>
 
-            <Form.Group as={Col} controlId="formGridPass" onChange={(e) => this.handleFormChange(e, "trip")}>
-              <OverlayTrigger trigger="hover" placement="top" overlay={passPopover}>
+            <Form.Group
+              as={Col}
+              controlId="formGridPass"
+              onChange={e => this.handleFormChange(e, "trip")}
+            >
+              <OverlayTrigger
+                trigger="hover"
+                placement="top"
+                overlay={passPopover}
+              >
                 <Form.Label>Password (?)</Form.Label>
               </OverlayTrigger>
-              <Form.Control placeholder="Password" style={this.state.tripError ? { border: "2px solid red" } : null} />
+              <Form.Control
+                maxLength={8}
+                placeholder="Password"
+                style={
+                  this.state.tripError ? { border: "2px solid red" } : null
+                }
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridFaction">
               <Form.Label>Faction</Form.Label>
               <Form.Control
                 as="select"
-                onChange={(e) => this.handleFormChange(e, "faction")}
+                onChange={e => this.handleFormChange(e, "faction")}
                 value={this.state.faction}
               >
                 <option>Loner</option>
@@ -342,7 +378,7 @@ class ReportForm extends React.Component {
             <Form.Group
               as={Col}
               controlId="formGridDifficulty"
-              onChange={(e) => this.handleFormChange(e, "difficulty")}
+              onChange={e => this.handleFormChange(e, "difficulty")}
               value={this.state.difficulty}
             >
               <Form.Label>Difficulty</Form.Label>
@@ -353,24 +389,37 @@ class ReportForm extends React.Component {
                 <option>Master</option>
               </Form.Control>
             </Form.Group>
-
           </Form.Row>
 
           <Form.Row>
-
-            <Form.Group as={Col} controlId="formGridPrimary" onChange={(e) => this.handleFormChange(e, "primary")}>
+            <Form.Group
+              as={Col}
+              controlId="formGridPrimary"
+              onChange={e => this.handleFormChange(e, "primary")}
+            >
               <Form.Label>Primary Weapon</Form.Label>
               <Form.Control placeholder="Izhmash AK-74" />
             </Form.Group>
 
-            <Form.Group as={Col} controlId="formGridSecondary" onChange={(e) => this.handleFormChange(e, "secondary")}>
+            <Form.Group
+              as={Col}
+              controlId="formGridSecondary"
+              onChange={e => this.handleFormChange(e, "secondary")}
+            >
               <Form.Label>Secondary</Form.Label>
               <Form.Control placeholder="Beretta 92FS" />
             </Form.Group>
 
-            <Form.Group as={Col} controlId="formGridLocation" onChange={(e) => this.handleFormChange(e, "location")}>
+            <Form.Group
+              as={Col}
+              controlId="formGridLocation"
+              onChange={e => this.handleFormChange(e, "location")}
+            >
               <Form.Label>Location Name</Form.Label>
-              <Form.Control placeholder="The Zone" style={this.state.locError ? { border: "2px solid red" } : null} />
+              <Form.Control
+                placeholder="The Zone"
+                style={this.state.locError ? { border: "2px solid red" } : null}
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridDate">
@@ -379,61 +428,66 @@ class ReportForm extends React.Component {
                 selected={this.state.date}
                 onChange={date => this.setState({ date: date })}
                 customInput={
-                  <Form.Control 
+                  <Form.Control
                     value={this.state.date}
-                    style={this.state.dateError ? { border: "2px solid red" } : null} 
+                    style={
+                      this.state.dateError ? { border: "2px solid red" } : null
+                    }
                     readOnly
                   />
                 }
               />
             </Form.Group>
-
-
           </Form.Row>
 
           <Form.Row>
-
             <Form.Group
               as={Col}
               controlId="formGridLat"
-              onChange={(e) => this.handleFormChange(e, "lat")}
+              onChange={e => this.handleFormChange(e, "lat")}
               value={this.state.lat}
             >
               <Form.Label>Latitude</Form.Label>
-              <Form.Control placeholder="51.389" style={this.state.latError ? { border: "2px solid red" } : null} />
+              <Form.Control
+                placeholder="51.389"
+                style={this.state.latError ? { border: "2px solid red" } : null}
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridLatDir">
               <Form.Label>&nbsp;</Form.Label>
               <Form.Control
                 as="select"
-                onChange={(e) => this.handleFormChange(e, "latDir")}
+                onChange={e => this.handleFormChange(e, "latDir")}
                 value={this.state.latDir}
               >
-                <option>N</option>
-                <option>S</option>
+                <option>NORTH</option>
+                <option>SOUTH</option>
               </Form.Control>
             </Form.Group>
 
             <Form.Group
               as={Col}
               controlId="formGridLon"
-              onChange={(e) => this.handleFormChange(e, "lon")}
+              onChange={e => this.handleFormChange(e, "lon")}
               value={this.state.lon}
             >
               <Form.Label>Longitude</Form.Label>
-              <Form.Control placeholder="30.099" style={this.state.lonError ? { border: "2px solid red" } : null} />
+              <Form.Control
+                placeholder="30.099"
+                style={this.state.lonError ? { border: "2px solid red" } : null}
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridLonDir">
               <Form.Label>&nbsp;</Form.Label>
               <Form.Control
                 as="select"
-                onChange={(e) => this.handleFormChange(e, "lonDir")}
+                onChange={e => this.handleFormChange(e, "lonDir")}
                 value={this.state.lonDir}
               >
-                <option>W</option>
-                <option>E</option>
+                <option>WEST</option>
+                <option>EAST</option>
               </Form.Control>
             </Form.Group>
 
@@ -441,7 +495,7 @@ class ReportForm extends React.Component {
               <Form.Label>Documents</Form.Label>
               <Form.Control
                 as="select"
-                onChange={(e) => this.handleFormChange(e, "documents")}
+                onChange={e => this.handleFormChange(e, "documents")}
                 value={this.state.documents}
               >
                 <option>0</option>
@@ -457,7 +511,7 @@ class ReportForm extends React.Component {
               <Form.Label>Artifacts</Form.Label>
               <Form.Control
                 as="select"
-                onChange={(e) => this.handleFormChange(e, "artifacts")}
+                onChange={e => this.handleFormChange(e, "artifacts")}
                 value={this.state.artifacts}
               >
                 <option>0</option>
@@ -473,103 +527,263 @@ class ReportForm extends React.Component {
                 <option>10</option>
               </Form.Control>
             </Form.Group>
-
           </Form.Row>
 
-          <div
-            id={this.mapDivId}
-            style={this.props.styles.map}
-          />
+          <Form.Row>
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              onChange={e => this.handleFormChange(e, "description")}
+              as="textarea"
+              rows={10}
+              maxLength={2000}
+              placeholder="Describe your experience..."
+            />
+          </Form.Row>
+
+          <div id={this.mapDivId} style={this.props.styles.map} />
 
           <hr />
 
-          <Form.Group id="formGridCheckbox" style={{ textAlign: "left" }} onChange={(e) => this.handleCheck(e)}>
+          <Form.Group
+            id="formGridCheckbox"
+            style={{ textAlign: "left" }}
+            onChange={e => this.handleCheck(e)}
+          >
             <h4>Completion</h4>
-            <Form.Check type="checkbox" label="Didn't complete faction task (-15)" value={-15} />
-            <Form.Check type="checkbox" label="Failure condition happened (-25)" value={-25} />
-            <Form.Check type="checkbox" label="Wore your factions patch (+5)" value={5} />
+            <Form.Check
+              type="checkbox"
+              label="Didn't complete faction task (-15)"
+              value={-15}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Failure condition happened (-25)"
+              value={-25}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Wore your factions patch (+5)"
+              value={5}
+            />
             <hr />
             <h4>Scavenging</h4>
-            <Form.Check type="checkbox" label="Brought back usable tool (+5)" value={5} />
-            <Form.Check type="checkbox" label="Found and used a piece of gear in the field (+5)" value={5} />
+            <Form.Check
+              type="checkbox"
+              label="Brought back usable tool (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Found and used a piece of gear in the field (+5)"
+              value={5}
+            />
             <hr />
             <h4>Environmental</h4>
-            <Form.Check type="checkbox" label="Brought and played harmonica or acoustic guitar (+5)" value={5} />
-            <Form.Check type="checkbox" label="Brought and read hard copy of Roadside Picnic (+5)" value={5} />
-            <Form.Check type="checkbox" label="It rained or snowed (+5)" value={5} />
-            <Form.Check type="checkbox" label="It rained or snowed the entire time (+5)" value={5} />
-            <Form.Check type="checkbox" label="Spent each night in a different structure (+10)" value={10} />
-            <Form.Check type="checkbox" label="Lit a campfire in an old container and squatted around it (+10)" value={10} />
-            <Form.Check type="checkbox" label="Stalked during winter and the average temperature was below freezing (+10)" value={10} />
+            <Form.Check
+              type="checkbox"
+              label="Brought and played harmonica or acoustic guitar (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Brought and read hard copy of Roadside Picnic (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="It rained or snowed (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="It rained or snowed the entire time (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Spent each night in a different structure (+10)"
+              value={10}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Lit a campfire in an old container and squatted around it (+10)"
+              value={10}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Stalked during winter and the average temperature was below freezing (+10)"
+              value={10}
+            />
             <hr />
             <h4>Social</h4>
-            <Form.Check type="checkbox" label="Your entire party was the same faction (+5)" value={5} />
-            <Form.Check type="checkbox" label="Left a stash behind (+5)" value={5} />
-            <Form.Check type="checkbox" label="Found another Stalker's stash (+10)" value={10} />
+            <Form.Check
+              type="checkbox"
+              label="Your entire party was the same faction (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Left a stash behind (+5)"
+              value={5}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Found another Stalker's stash (+10)"
+              value={10}
+            />
             <hr />
             <h4>Extreme Mode</h4>
-            <Form.Check type="checkbox" label="Explored a real-life exclusion zone (+20)" value={20} />
-            <Form.Check type="checkbox" label="Zone was actually irradiated above normal ambient levels (+20)" value={20} />
-            <Form.Check type="checkbox" label="Actually did this in Chernobyl (+40)" value={40} />
+            <Form.Check
+              type="checkbox"
+              label="Explored a real-life exclusion zone (+20)"
+              value={20}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Zone was actually irradiated above normal ambient levels (+20)"
+              value={20}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Actually did this in Chernobyl (+40)"
+              value={40}
+            />
             <hr />
             <h4>Faction Specific</h4>
-            {this.state.faction === "Loner" &&
-              <Form.Check type="checkbox" label="Brought pistol carbine or 9x18 pistol (+5)" value={5} />
-            }
-            {this.state.faction === "Bandit" &&
+            {this.state.faction === "Loner" && (
+              <Form.Check
+                type="checkbox"
+                label="Brought pistol carbine or 9x18 pistol (+5)"
+                value={5}
+              />
+            )}
+            {this.state.faction === "Bandit" && (
               <div>
-                <Form.Check type="checkbox" label="Wore nothing but Adidas clothing (+5)" value={5} />
                 <Form.Check
                   type="checkbox"
-                  label="Snuck up behind a non-stalker, shouted 'CHEEKI BREEKI IV DAMKE' and ran away (+15)" value={15}
+                  label="Wore nothing but Adidas clothing (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Snuck up behind a non-stalker, shouted 'CHEEKI BREEKI IV DAMKE' and ran away (+15)"
+                  value={15}
                 />
               </div>
-            }
-            {this.state.faction === "Military" &&
+            )}
+            {this.state.faction === "Military" && (
               <div>
-                <Form.Check type="checkbox" label="Slavshit rifle and pistol combo (+5)" value={5} />
-                <Form.Check type="checkbox" label="Only ate MREs (+5)" value={5} />
-                <Form.Check type="checkbox" label="Armor was actually slavshit (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Slavshit rifle and pistol combo (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Only ate MREs (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Armor was actually slavshit (+10)"
+                  value={10}
+                />
               </div>
-            }
-            {this.state.faction === "Monolith" &&
+            )}
+            {this.state.faction === "Monolith" && (
               <div>
-                <Form.Check type="checkbox" label="Audibly chanted or made noise while praying (+5)" value={5} />
-                <Form.Check type="checkbox" label="Wore a gas mask at all times while outside (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Audibly chanted or made noise while praying (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Wore a gas mask at all times while outside (+10)"
+                  value={10}
+                />
               </div>
-            }
-            {this.state.faction === "Scientist" &&
+            )}
+            {this.state.faction === "Scientist" && (
               <div>
-                <Form.Check type="checkbox" label="Wore gas mask or respirator at all times while inside a structure (+10)" value={10} />
-                <Form.Check type="checkbox" label="Did logging with a Geiger counter (+5)" value={5} />
-                <Form.Check type="checkbox" label="Did logging with a toxic gas meter (+10)" value={5} />
+                <Form.Check
+                  type="checkbox"
+                  label="Wore gas mask or respirator at all times while inside a structure (+10)"
+                  value={10}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Did logging with a Geiger counter (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Did logging with a toxic gas meter (+10)"
+                  value={5}
+                />
               </div>
-            }
-            {this.state.faction === "Mercenary" &&
+            )}
+            {this.state.faction === "Mercenary" && (
               <div>
-                <Form.Check type="checkbox" label="Brought two friends and designated one as the commander (+10)" value={10} />
-                <Form.Check type="checkbox" label="Logged complete field report on paper, placed report in stash and posted photos of report to /k/ (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Brought two friends and designated one as the commander (+10)"
+                  value={10}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Logged complete field report on paper, placed report in stash and posted photos of report to /k/ (+10)"
+                  value={10}
+                />
               </div>
-            }
-            {this.state.faction === "Duty" &&
+            )}
+            {this.state.faction === "Duty" && (
               <div>
-                <Form.Check type="checkbox" label="Killed a mutant (any wild animal) (+5)" value={5} />
-                <Form.Check type="checkbox" label="Posted or will post a complete field report of everything you did and observed on /k/ (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Killed a mutant (any wild animal) (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Posted or will post a complete field report of everything you did and observed on /k/ (+10)"
+                  value={10}
+                />
               </div>
-            }
-            {this.state.faction === "Freedom" &&
+            )}
+            {this.state.faction === "Freedom" && (
               <div>
-                <Form.Check type="checkbox" label="Wore all Flecktarn camo (+5)" value={5} />
-                <Form.Check type="checkbox" label="Smoked something (cigs, pot, random plant, etc) (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Wore all Flecktarn camo (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Smoked something (cigs, pot, random plant, etc) (+10)"
+                  value={10}
+                />
               </div>
-            }
-            {this.state.faction === "Clear Sky" &&
+            )}
+            {this.state.faction === "Clear Sky" && (
               <div>
-                <Form.Check type="checkbox" label="Camped in a swamp (+5)" value={5} />
-                <Form.Check type="checkbox" label="Set up a base with fortifications and/or camo netting or similar disguise (+5)" value={5} />
-                <Form.Check type="checkbox" label="Set up a second base and camp in one of your two bases (+10)" value={10} />
+                <Form.Check
+                  type="checkbox"
+                  label="Camped in a swamp (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Set up a base with fortifications and/or camo netting or similar disguise (+5)"
+                  value={5}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Set up a second base and camp in one of your two bases (+10)"
+                  value={10}
+                />
               </div>
-            }
+            )}
             <hr />
           </Form.Group>
 
@@ -584,12 +798,14 @@ class ReportForm extends React.Component {
             id="file"
             accept=".png, .jpg, .jpeg"
             multiple
-            onChange={(e) => this.handleImageUpload(e)}
+            onChange={e => this.handleImageUpload(e)}
             style={this.props.styles.input}
           />
 
           <label htmlFor="file">
-            <Button variant="dark" as="div">Upload Images</Button>
+            <Button variant="dark" as="div">
+              Upload Images
+            </Button>
           </label>
         </Form>
 
@@ -609,7 +825,7 @@ class ReportForm extends React.Component {
           style={{ marginBottom: "5em" }}
         >
           Submit Report
-          </Button>
+        </Button>
 
         <Modal show={this.state.successModal} onHide={this.closeSuccess}>
           <Modal.Header closeButton>
@@ -619,10 +835,9 @@ class ReportForm extends React.Component {
           <Modal.Footer>
             <Button variant="secondary" onClick={this.closeSuccess}>
               Close
-          </Button>
+            </Button>
           </Modal.Footer>
         </Modal>
-
       </div>
     );
   }
