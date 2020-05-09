@@ -8,17 +8,15 @@ function Menu(props) {
     <Navbar bg='dark' variant='dark'>
       <Navbar.Brand
         href='/'
-        style={{ color: '#ffc107', fontSize: '1.5em' }}
+        style={{ color: '#ffc71f', fontSize: '2em', paddingLeft: 10 }}
         className='special'
       >
         Innazone
       </Navbar.Brand>
       <Nav className='mr-auto'>
-        <Nav.Link href='/'>Home</Nav.Link>
-        <Nav.Link href='/create'>Create</Nav.Link>
-        <Nav.Link href='/view'>View</Nav.Link>
-        <Nav.Link href='/settings'>Settings</Nav.Link>
-        <Nav.Link href='/challenge'>The Challenge</Nav.Link>
+        <Nav.Link href='/'>HOME</Nav.Link>
+        <Nav.Link href='/create'>CREATE</Nav.Link>
+        <Nav.Link href='/view'>VIEW</Nav.Link>
       </Nav>
 
       {props.report && (

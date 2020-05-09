@@ -105,3 +105,7 @@ body > #root > div {
   background-position: center;
   background-size: cover;
 }
+
+.nav-link:hover {
+  color: #ffc71f !important;
+}
