@@ -51,7 +51,8 @@ class ReportForm extends React.Component {
       latDir: 'NORTH',
       captcha: false,
       copy: false,
-      date: new Date()
+      date: new Date(),
+      checkArray: []
     };
 
     this.handleFormChange = this.handleFormChange.bind(this);
@@ -192,6 +193,7 @@ class ReportForm extends React.Component {
   }
 
   handleCheck(event) {
+    event.persist();
     let total = this.state.checkTotal;
     if (event.target.checked) {
       total += event.target.value * 1;
@@ -199,9 +201,23 @@ class ReportForm extends React.Component {
       total -= event.target.value * 1;
     }
 
-    this.setState({ checkTotal: total }, () => {
-      this.calculateTotal();
-    });
+    this.setState(
+      (state) => {
+        let list = state.checkArray;
+        if (event.target.checked) {
+          list.push(event.target.id);
+        } else {
+          list.splice(list.indexOf(event.target.id), 1);
+        }
+        return {
+          checkTotal: total,
+          checkArray: list
+        };
+      },
+      () => {
+        this.calculateTotal();
+      }
+    );
   }
 
   handleImageUpload(event) {
@@ -281,7 +297,8 @@ class ReportForm extends React.Component {
           artifacts: this.state.artifacts,
           total: this.state.total,
           rank: this.state.rank,
-          date: this.state.date.getTime()
+          date: this.state.date.getTime(),
+          checks: this.state.checkArray
         })
         .then((res) => {
           let id = res._key.path.segments[1];
@@ -564,16 +581,19 @@ class ReportForm extends React.Component {
               type='checkbox'
               label="Didn't complete faction task (-15)"
               value={-15}
+              id={1}
             />
             <Form.Check
               type='checkbox'
               label='Failure condition happened (-25)'
               value={-25}
+              id={2}
             />
             <Form.Check
               type='checkbox'
               label='Wore your factions patch (+5)'
               value={5}
+              id={3}
             />
             <hr />
             <h4>Scavenging</h4>
@@ -581,11 +601,13 @@ class ReportForm extends React.Component {
               type='checkbox'
               label='Brought back usable tool (+5)'
               value={5}
+              id={4}
             />
             <Form.Check
               type='checkbox'
               label='Found and used a piece of gear in the field (+5)'
               value={5}
+              id={5}
             />
             <hr />
             <h4>Environmental</h4>
@@ -593,36 +615,43 @@ class ReportForm extends React.Component {
               type='checkbox'
               label='Brought and played harmonica or acoustic guitar (+5)'
               value={5}
+              id={6}
             />
             <Form.Check
               type='checkbox'
               label='Brought and read hard copy of Roadside Picnic (+5)'
               value={5}
+              id={7}
             />
             <Form.Check
               type='checkbox'
               label='It rained or snowed (+5)'
               value={5}
+              id={38}
             />
             <Form.Check
               type='checkbox'
               label='It rained or snowed the entire time (+5)'
               value={5}
+              id={8}
             />
             <Form.Check
               type='checkbox'
               label='Spent each night in a different structure (+10)'
               value={10}
+              id={9}
             />
             <Form.Check
               type='checkbox'
               label='Lit a campfire in an old container and squatted around it (+10)'
               value={10}
+              id={10}
             />
             <Form.Check
               type='checkbox'
               label='Stalked during winter and the average temperature was below freezing (+10)'
               value={10}
+              id={11}
             />
             <hr />
             <h4>Social</h4>
@@ -630,16 +659,19 @@ class ReportForm extends React.Component {
               type='checkbox'
               label='Your entire party was the same faction (+5)'
               value={5}
+              id={12}
             />
             <Form.Check
               type='checkbox'
               label='Left a stash behind (+5)'
               value={5}
+              id={13}
             />
             <Form.Check
               type='checkbox'
               label="Found another Stalker's stash (+10)"
               value={10}
+              id={14}
             />
             <hr />
             <h4>Extreme Mode</h4>
@@ -647,16 +679,19 @@ class ReportForm extends React.Component {
               type='checkbox'
               label='Explored a real-life exclusion zone (+20)'
               value={20}
+              id={15}
             />
             <Form.Check
               type='checkbox'
               label='Zone was actually irradiated above normal ambient levels (+20)'
               value={20}
+              id={16}
             />
             <Form.Check
               type='checkbox'
               label='Actually did this in Chernobyl (+40)'
               value={40}
+              id={17}
             />
             <hr />
             <h4>Faction Specific</h4>
@@ -665,6 +700,7 @@ class ReportForm extends React.Component {
                 type='checkbox'
                 label='Brought pistol carbine or 9x18 pistol (+5)'
                 value={5}
+                id={18}
               />
             )}
             {this.state.faction === 'Bandit' && (
@@ -673,11 +709,13 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Wore nothing but Adidas clothing (+5)'
                   value={5}
+                  id={19}
                 />
                 <Form.Check
                   type='checkbox'
                   label="Snuck up behind a non-stalker, shouted 'CHEEKI BREEKI IV DAMKE' and ran away (+15)"
                   value={15}
+                  id={20}
                 />
               </div>
             )}
@@ -687,16 +725,19 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Slavshit rifle and pistol combo (+5)'
                   value={5}
+                  id={21}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Only ate MREs (+5)'
                   value={5}
+                  id={22}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Armor was actually slavshit (+10)'
                   value={10}
+                  id={23}
                 />
               </div>
             )}
@@ -706,11 +747,13 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Audibly chanted or made noise while praying (+5)'
                   value={5}
+                  id={24}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Wore a gas mask at all times while outside (+10)'
                   value={10}
+                  id={25}
                 />
               </div>
             )}
@@ -720,16 +763,19 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Wore gas mask or respirator at all times while inside a structure (+10)'
                   value={10}
+                  id={26}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Did logging with a Geiger counter (+5)'
                   value={5}
+                  id={27}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Did logging with a toxic gas meter (+10)'
                   value={5}
+                  id={28}
                 />
               </div>
             )}
@@ -739,11 +785,13 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Brought two friends and designated one as the commander (+10)'
                   value={10}
+                  id={29}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Logged complete field report on paper, placed report in stash and posted photos of report to /k/ (+10)'
                   value={10}
+                  id={30}
                 />
               </div>
             )}
@@ -753,11 +801,13 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Killed a mutant (any wild animal) (+5)'
                   value={5}
+                  id={31}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Posted or will post a complete field report of everything you did and observed on /k/ (+10)'
                   value={10}
+                  id={32}
                 />
               </div>
             )}
@@ -767,11 +817,13 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Wore all Flecktarn camo (+5)'
                   value={5}
+                  id={33}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Smoked something (cigs, pot, random plant, etc) (+10)'
                   value={10}
+                  id={34}
                 />
               </div>
             )}
@@ -781,16 +833,19 @@ class ReportForm extends React.Component {
                   type='checkbox'
                   label='Camped in a swamp (+5)'
                   value={5}
+                  id={35}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Set up a base with fortifications and/or camo netting or similar disguise (+5)'
                   value={5}
+                  id={36}
                 />
                 <Form.Check
                   type='checkbox'
                   label='Set up a second base and camp in one of your two bases (+10)'
                   value={10}
+                  id={37}
                 />
               </div>
             )}

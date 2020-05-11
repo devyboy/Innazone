@@ -6,12 +6,11 @@ import 'firebase/firestore';
 import FourOhFour from '../pages/FourOhFour';
 import Menu from '../components/menu';
 import { Modal, Button, Form } from 'react-bootstrap';
+import ViewForm from '../components/viewform';
 
 import OlMap from 'ol/Map';
-import OlView from 'ol/View';
 import OlLayerTile from 'ol/layer/Tile';
 import OlSourceOSM from 'ol/source/OSM';
-import { fromLonLat } from 'ol/proj';
 
 import Reaptcha from 'reaptcha';
 
@@ -22,11 +21,12 @@ const styles = {
     width: '50em',
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: '3em',
+    marginBottom: '4em',
     padding: '3em',
     borderRadius: '5px',
     backgroundImage: `url(${paper})`,
-    backgroundRepeat: 'repeat'
+    backgroundRepeat: 'repeat',
+    marginTop: '3.5em'
   },
   map: {
     height: '400px',
@@ -36,6 +36,32 @@ const styles = {
     marginTop: '2em',
     marginBottom: '2em',
     border: '1px solid black'
+  },
+  input: {
+    width: '0.1px',
+    height: '0.1px',
+    opacity: 0,
+    overflow: 'hidden',
+    position: 'absolute',
+    zIndex: -1
+  },
+  label: {
+    fontSize: '1em',
+    color: 'white',
+    backgroundColor: 'red',
+    width: '150px',
+    padding: '.25em',
+    borderRadius: 5,
+    display: 'block',
+    cursor: 'pointer',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  },
+  captcha: {
+    width: '300px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingBottom: '2em'
   }
 };
 
@@ -79,18 +105,7 @@ class ReportPage extends React.Component {
       if (!doc.exists) {
         ReactDOM.render(<FourOhFour />, document.getElementById('root'));
       } else {
-        this.setState({ data: doc.data() }, () => {
-          this.map.setTarget(this.mapDivId);
-          this.map.setView(
-            new OlView({
-              center: fromLonLat([
-                this.state.data.longitude,
-                this.state.data.latitude
-              ]),
-              zoom: 16
-            })
-          );
-        });
+        this.setState({ data: doc.data() });
       }
     });
   }
@@ -129,38 +144,14 @@ class ReportPage extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className='App' style={{ height: '100%', paddingBottom: '2em' }}>
         <Menu report delete={this.showDelete} />
         {this.state.data === null ? (
           <Spinner />
         ) : (
-          <div style={styles.form} className='special'>
-            <h2 style={{ float: 'left' }}>
-              <strong>{this.state.data.name}</strong>
-              {' #' + this.state.data.trip}
-            </h2>
-            <h4 style={{ float: 'right' }}>
-              {new Date(this.state.data.date).toISOString().split('T')[0]}
-            </h4>
-            <div style={{ clear: 'both' }}></div>
-            <hr />
-            <ul style={{ textAlign: 'left' }}>
-              <li>Difficulty: {this.state.data.difficulty}</li>
-              <li>Faction: {this.state.data.faction}</li>
-              <li>Primary: {this.state.data.primary}</li>
-              <li>Secondary: {this.state.data.secondary}</li>
-              <li>Location: {this.state.data.location}</li>
-              <li>Latitude: {this.state.data.latitude}</li>
-              <li>Longitude: {this.state.data.longitude}</li>
-              <li>Documents Found: {this.state.data.documents}</li>
-              <li>Artifacts Found: {this.state.data.artifacts}</li>
-              <li>Total points: {this.state.data.total}</li>
-              <li>Rank: {this.state.data.rank}</li>
-              <li>Description: {this.state.data.description}</li>
-            </ul>
-            <div id={this.mapDivId} style={styles.map} />
+          <div className='special'>
+            <ViewForm styles={styles} data={this.state.data} />
           </div>
         )}
 

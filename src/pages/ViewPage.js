@@ -1,29 +1,29 @@
-import React from "react";
-import Menu from "../components/menu";
-import Spinner from "../components/spinner";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import Card from "react-bootstrap/Card";
-import Toast from "react-bootstrap/Toast";
-import paper from "../images/paper.png";
+import React from 'react';
+import Menu from '../components/menu';
+import Spinner from '../components/spinner';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import Card from 'react-bootstrap/Card';
+import Toast from 'react-bootstrap/Toast';
+import paper from '../images/paper.png';
 
 const styles = {
   card: {
     backgroundImage: `url(${paper})`,
-    backgroundRepeat: "repeat",
-    textAlign: "left",
-    cursor: "pointer",
+    backgroundRepeat: 'repeat',
+    textAlign: 'left',
+    cursor: 'pointer'
   },
   gridContainer: {
-    padding: "50px",
-    gridGap: "50px",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
+    padding: '50px',
+    gridGap: '50px',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))'
   },
   header: {
-    margin: "2em",
-    color: "#fff",
-  },
+    margin: '2em',
+    color: '#fff'
+  }
 };
 
 class ViewPage extends React.Component {
@@ -34,7 +34,7 @@ class ViewPage extends React.Component {
 
   componentDidMount() {
     let reports = [];
-    let reportRef = firebase.firestore().collection("reports");
+    let reportRef = firebase.firestore().collection('reports');
     reportRef
       .get()
       .then((snapshot) => {
@@ -45,7 +45,7 @@ class ViewPage extends React.Component {
       .then(() => {
         this.setState({
           reports: reports,
-          deleted: this.props.location.state ? true : false,
+          deleted: this.props.location.state ? true : false
         });
       });
   }
@@ -53,7 +53,7 @@ class ViewPage extends React.Component {
   render() {
     console.log(this.props);
     return (
-      <div className="App">
+      <div className='App'>
         <Menu />
         {!this.state ? (
           <Spinner />
@@ -70,9 +70,9 @@ class ViewPage extends React.Component {
                       }
                     >
                       <Card.Body>
-                        <Card.Title id="card-title">
+                        <Card.Title id='card-title'>
                           <strong>{report[0].name}</strong>
-                          {" #" + report[0].trip}
+                          {' #' + report[0].trip}
                         </Card.Title>
                         <hr />
                         <Card.Text>
@@ -91,7 +91,7 @@ class ViewPage extends React.Component {
                 })}
               </div>
             ) : (
-              <h1 style={styles.header} className="special">
+              <h1 style={styles.header} className='special'>
                 PDA is empty!
               </h1>
             )}
@@ -103,20 +103,20 @@ class ViewPage extends React.Component {
           delay={5500}
           autohide
           style={{
-            position: "absolute",
-            textAlign: "left",
+            position: 'absolute',
+            textAlign: 'left',
             width: 300,
             bottom: 50,
-            right: 40,
+            right: 40
           }}
         >
           <Toast.Header>
             <img
-              src="holder.js/20x20?text=%20"
-              className="rounded mr-2"
-              alt=""
+              src='holder.js/20x20?text=%20'
+              className='rounded mr-2'
+              alt=''
             />
-            <strong className="mr-auto">Innazone</strong>
+            <strong className='mr-auto'>Innazone</strong>
             <small>just now</small>
           </Toast.Header>
           <Toast.Body>Field report successfully deleted</Toast.Body>
