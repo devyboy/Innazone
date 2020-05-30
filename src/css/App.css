@@ -109,3 +109,12 @@ body > #root > div {
 .nav-link:hover {
   color: #ffc71f !important;
 }
+
+#challenge h1:after,
+h2:after {
+  content: ' ';
+  display: block;
+  border: 0.5px solid #fff;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
